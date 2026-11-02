@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CodigoCategoria;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,11 +13,12 @@ class Categoria extends Model
 
     public $timestamps = false;
 
-    protected $fillable = ['unidad_id', 'nombre', 'descripcion', 'activa', 'radio_cercania_m'];
+    protected $fillable = ['codigo', 'unidad_id', 'nombre', 'descripcion', 'activa', 'radio_cercania_m'];
 
     protected function casts(): array
     {
         return [
+            'codigo' => CodigoCategoria::class,
             'activa' => 'boolean',
             'radio_cercania_m' => 'integer',
         ];
