@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TipoUsuario;
+use App\Notifications\RegistrarPassword;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable implements FilamentUser, HasName
 {
@@ -120,6 +122,38 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function esAdministrador(): bool
     {
         return $this->tipo === TipoUsuario::Administrador;
+    }
+
+    /**
+     * Crea un enlace de un solo uso que vence en 48 horas. Solo se guarda el hash del token.
+     */
+    public function enviarEnlaceRegistro(): void
+    {
+        $token = Str::random(64);
+
+        $this->forceFill([
+            'token_recuperacion_hash' => hash('sha256', $token),
+            'token_expira' => now()->addHours(48),
+        ])->save();
+
+        $this->notify(new RegistrarPassword($token));
+    }
+
+    public function validarToken(string $token): bool
+    {
+        return filled($this->token_recuperacion_hash)
+            && $this->token_expira?->isFuture()
+            && hash_equals($this->token_recuperacion_hash, hash('sha256', $token));
+    }
+
+    public function registrarPassword(string $password): void
+    {
+        $this->forceFill([
+            'password_hash' => $password,
+            'debe_registrar_password' => false,
+            'token_recuperacion_hash' => null,
+            'token_expira' => null,
+        ])->save();
     }
 
     public function unidad(): BelongsTo
