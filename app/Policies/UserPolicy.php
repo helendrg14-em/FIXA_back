@@ -29,6 +29,14 @@ class UserPolicy
         return $user->esAdministrador();
     }
 
+    /**
+     * Nadie se desactiva a sí mismo: así siempre queda un administrador con acceso.
+     */
+    public function desactivar(User $user, User $model): bool
+    {
+        return $user->esAdministrador() && ! $user->is($model);
+    }
+
     public function delete(User $user, User $model): bool
     {
         return false;
