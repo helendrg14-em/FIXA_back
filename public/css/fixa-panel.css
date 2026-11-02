@@ -1,0 +1,27 @@
+/* Identidad FIXA sobre Filament: anillos en el login, crema de fondo y barra lateral oscura. */
+:root { --fixa-noche: #1f192f; --fixa-rio: #2d6073; --fixa-menta: #65b8a6; --fixa-brote: #b5e8c3; --fixa-crema: #f0f7da; }
+
+html, body.fi-body { background-color: var(--fixa-crema); }
+body.fi-body { font-size: 1rem; }
+
+.fi-simple-layout {
+    background: var(--fixa-noche) url('../images/anillos.svg') no-repeat right -14rem center / 56rem;
+}
+.fi-simple-main { background: var(--fixa-crema); border-radius: 1.25rem; box-shadow: none; }
+.fi-simple-header-heading, .fi-header-heading { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; letter-spacing: -.02em; color: var(--fixa-noche); }
+
+.fi-sidebar, .fi-sidebar-header, .fi-sidebar-nav { background-color: var(--fixa-noche); }
+.fi-sidebar-item-label { color: var(--fixa-crema); }
+.fi-sidebar-item-icon { color: var(--fixa-menta); }
+.fi-sidebar-item-btn:hover, .fi-sidebar-item-btn:focus-visible { background-color: var(--fixa-rio); }
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn { background-color: var(--fixa-rio); }
+.fi-sidebar-item.fi-active .fi-sidebar-item-label, .fi-sidebar-item.fi-active .fi-sidebar-item-icon { color: var(--fixa-brote); }
+.fi-sidebar-nav-groups { background: transparent; }
+
+.fi-topbar, .fi-topbar nav { background-color: var(--fixa-crema); }
+.fi-section, .fi-ta-ctn, .fi-wi-widget { box-shadow: none; }
+.fi-btn { min-height: 2.75rem; }
+
+@media (max-width: 40rem) {
+    .fi-simple-layout { background-position: right -22rem bottom -14rem; background-size: 44rem; }
+}

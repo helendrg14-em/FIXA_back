@@ -1,0 +1,191 @@
+/* FIXA: identidad basada en los anillos de Santa Cruz de la Sierra. */
+:root {
+    --noche: #1f192f;
+    --rio: #2d6073;
+    --menta: #65b8a6;
+    --brote: #b5e8c3;
+    --crema: #f0f7da;
+    --texto: 'Atkinson Hyperlegible', system-ui, sans-serif;
+    --titulo: 'Bricolage Grotesque', 'Atkinson Hyperlegible', sans-serif;
+    --margen: clamp(1.25rem, 5vw, 5rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    background: var(--crema);
+    color: var(--noche);
+    font: 400 1.125rem/1.6 var(--texto);
+}
+
+h1, h2, h3 { font-family: var(--titulo); line-height: 1.05; margin: 0; text-wrap: balance; }
+h2 { font-size: clamp(2.1rem, 5vw, 3.75rem); font-weight: 700; letter-spacing: -.02em; }
+p { margin: 0; }
+
+:focus-visible { outline: 3px solid var(--menta); outline-offset: 3px; }
+
+.saltar {
+    position: absolute; left: 1rem; top: -4rem; z-index: 10;
+    background: var(--crema); color: var(--noche); padding: .75rem 1rem;
+}
+.saltar:focus { top: 1rem; }
+
+.boton {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 3.25rem; padding: .75rem 1.75rem; border-radius: 999px;
+    font-weight: 700; text-decoration: none;
+    transition: transform .15s ease, background-color .15s ease;
+}
+.boton:hover { transform: translateY(-2px); }
+.boton-claro { background: var(--brote); color: var(--noche); }
+.boton-claro:hover { background: var(--crema); }
+.boton-oscuro { background: var(--noche); color: var(--crema); }
+.boton-oscuro:hover { background: var(--rio); }
+.boton-inactivo { border: 2px dashed var(--noche); color: var(--noche); cursor: not-allowed; }
+.boton-inactivo:hover { transform: none; }
+
+/* Portada: los anillos salen del borde derecho, como la ciudad que crece hacia afuera. */
+.portada { background: var(--noche); color: var(--crema); overflow: hidden; }
+
+.barra {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 1.25rem var(--margen);
+}
+.marca { display: inline-flex; min-height: 44px; align-items: center; }
+.marca img { display: block; }
+.barra-enlace {
+    color: var(--crema); min-height: 44px; display: inline-flex; align-items: center;
+    text-underline-offset: .25em;
+}
+
+.portada-cuerpo {
+    position: relative;
+    display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: center;
+    padding: clamp(2rem, 6vw, 5rem) var(--margen) clamp(4rem, 9vw, 8rem);
+    min-height: min(78vh, 46rem);
+}
+.portada-texto { position: relative; z-index: 1; max-width: 46rem; }
+.portada h1 { font-size: clamp(2.75rem, 7.2vw, 6rem); font-weight: 800; letter-spacing: -.03em; }
+.portada-texto p { max-width: 34rem; margin: 1.75rem 0 2.25rem; font-size: clamp(1.125rem, 1.8vw, 1.375rem); }
+
+.anillos {
+    position: absolute; margin: 0;
+    right: clamp(-16rem, -14vw, -6rem); top: 50%;
+    width: clamp(30rem, 58vw, 56rem); aspect-ratio: 1;
+    transform: translateY(-50%);
+}
+.anillos svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.anillos-radios path { fill: none; stroke: var(--rio); stroke-width: 2; }
+.anillos-vias circle {
+    fill: none; stroke: var(--menta); stroke-width: 3;
+    transform: rotate(-90deg); transform-origin: 400px 400px;
+}
+.anillos-plaza { fill: var(--brote); }
+.punto circle { fill: var(--brote); }
+.punto path { fill: none; stroke: var(--noche); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Lista: tipografía grande en vez de tarjetas repetidas. */
+.reportes { padding: clamp(4rem, 9vw, 8rem) var(--margen); }
+.lista-reportes { margin: clamp(2rem, 5vw, 4rem) 0 0; }
+.lista-reportes > div {
+    display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: .5rem 2rem;
+    align-items: baseline;
+    padding: 1.75rem 0;
+    border-top: 2px solid var(--rio);
+}
+.lista-reportes > div:last-child { border-bottom: 2px solid var(--rio); }
+.lista-reportes dt { font: 700 clamp(1.5rem, 3.4vw, 2.75rem)/1.1 var(--titulo); letter-spacing: -.015em; }
+.lista-reportes dd { margin: 0; color: var(--rio); font-weight: 700; }
+
+/* Recorrido: el camino de un reporte, trazado como una avenida. */
+.recorrido { background: var(--rio); color: var(--crema); padding: clamp(4rem, 9vw, 8rem) var(--margen); }
+.recorrido ol {
+    list-style: none; counter-reset: paso;
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2.5rem;
+    margin: clamp(2.5rem, 5vw, 4.5rem) 0 0; padding: 0;
+    position: relative;
+}
+.recorrido ol::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 1.625rem;
+    border-top: 3px solid var(--menta);
+}
+.recorrido li { counter-increment: paso; position: relative; }
+.recorrido li::before {
+    content: counter(paso);
+    display: grid; place-items: center;
+    width: 3.25rem; height: 3.25rem; border-radius: 50%;
+    background: var(--brote); color: var(--noche);
+    font: 800 1.5rem/1 var(--titulo);
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+.recorrido h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: .75rem; }
+
+.otros { background: var(--brote); padding: clamp(4rem, 9vw, 8rem) var(--margen); }
+.otros-intro { margin-top: 1.25rem; max-width: 40rem; }
+.otros ul { list-style: none; margin: 2.5rem 0 0; padding: 0; max-width: 56rem; }
+.otros li {
+    display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: .25rem 2rem;
+    padding: 1.25rem 0; border-top: 2px solid var(--noche);
+}
+.otros li strong { font: 700 1.375rem/1.2 var(--titulo); }
+.otros-aviso { margin-top: 2.5rem; max-width: 40rem; font-weight: 700; }
+
+.descarga { background: var(--menta); padding: clamp(4rem, 8vw, 7rem) var(--margen); }
+.descarga p { margin: 1.25rem 0 2rem; font-size: 1.25rem; max-width: 36rem; }
+
+.pie {
+    background: var(--noche); color: var(--crema);
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem 3rem;
+    padding: 2.5rem var(--margen);
+}
+.pie p { max-width: 42rem; }
+.pie a { color: var(--brote); min-height: 44px; display: inline-flex; align-items: center; text-underline-offset: .25em; }
+
+/* Un solo movimiento: los anillos se trazan al abrir la página. */
+@media (prefers-reduced-motion: no-preference) {
+    .anillos-vias circle { animation: trazar 1.4s cubic-bezier(.3, .7, .2, 1) both; }
+    .anillos-vias circle:nth-child(2) { animation-delay: .1s; }
+    .anillos-vias circle:nth-child(3) { animation-delay: .2s; }
+    .anillos-vias circle:nth-child(4) { animation-delay: .3s; }
+    .anillos-vias circle:nth-child(5) { animation-delay: .4s; }
+}
+@keyframes trazar { from { stroke-dasharray: 0 2300; } to { stroke-dasharray: 2300 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .boton { transition: none; }
+    .boton:hover { transform: none; }
+}
+
+@media (max-width: 62rem) {
+    .portada-cuerpo { display: block; min-height: 0; padding-bottom: 0; }
+    .anillos { position: relative; right: auto; top: auto; transform: none; width: 118%; margin: 2rem -9% -22%; }
+    .recorrido ol { grid-template-columns: 1fr; gap: 2rem; }
+    .recorrido ol::before { top: 0; bottom: 0; left: 1.5rem; right: auto; border-top: 0; border-left: 3px solid var(--menta); }
+    .recorrido li { padding-left: 4.5rem; }
+    .recorrido li::before { position: absolute; left: 0; top: 0; margin: 0; }
+}
+
+@media (max-width: 40rem) {
+    .lista-reportes > div, .otros li { grid-template-columns: 1fr; }
+    .barra-enlace { font-size: 1rem; }
+}
+
+/* Crear contraseña */
+.acceso-pagina { min-height: 100vh; background: var(--noche) url('../images/anillos.svg') no-repeat right -14rem center / 56rem; display: grid; place-items: center; padding: 2rem 1.25rem; }
+.acceso-tarjeta { width: min(100%, 30rem); background: var(--crema); padding: clamp(1.75rem, 5vw, 2.75rem); border-radius: 1.25rem; }
+.acceso-tarjeta img { display: block; margin-bottom: 1.75rem; }
+.acceso-tarjeta h1 { font-size: 2.1rem; font-weight: 800; letter-spacing: -.02em; }
+.acceso-tarjeta > p { margin-top: .75rem; }
+.campo { margin-top: 1.5rem; }
+.campo label { display: block; font-weight: 700; margin-bottom: .4rem; }
+.campo input { width: 100%; min-height: 3.25rem; padding: .6rem .9rem; font: inherit; color: var(--noche); background: #fff; border: 2px solid var(--rio); border-radius: .6rem; }
+.campo small { display: block; margin-top: .4rem; }
+.error { display: block; margin-top: .4rem; font-weight: 700; color: #a3222b; }
+.acceso-tarjeta .boton { width: 100%; margin-top: 1.75rem; border: 0; font: inherit; font-weight: 700; cursor: pointer; }
