@@ -4,7 +4,7 @@ use App\Http\Controllers\Cuenta\RegistrarPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('portal');
+    return view('publico.portal');
 })->name('portal');
 
 Route::middleware('throttle:10,1')->group(function () {
