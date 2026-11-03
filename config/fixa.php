@@ -2,8 +2,8 @@
 
 return [
 
-    // Enlace de descarga de la app Android. Vacío: el portal avisa que estará disponible pronto.
-    'app_url' => env('FIXA_APP_URL'),
+    // Enlace de descarga de la app Android. Sin FIXA_APP_URL se usa el último APK publicado en GitHub Releases.
+    'app_url' => env('FIXA_APP_URL') ?: 'https://github.com/helendrg14-em/FIXA_app/releases/latest/download/fixa.apk',
 
     // Calendario de Bolivia: define la gestión del código y qué día es hábil o feriado.
     'zona_horaria' => 'America/La_Paz',
