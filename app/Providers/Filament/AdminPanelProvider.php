@@ -8,11 +8,9 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\FontProviders\LocalFontProvider;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\View\PanelsRenderHook;
-use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -32,27 +30,28 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('FIXA')
             // Sin ->registration(): las cuentas las crea solo el administrador (R03).
             ->login(Login::class)
-            ->brandLogo(fn (): string => asset('images/fixa-logo.svg'))
+            // Dos versiones del logo: la clara va sobre la barra lateral verde oscura (fixa-panel.css).
+            ->brandLogo(fn (): HtmlString => new HtmlString(view('panel.logo')->render()))
             ->brandLogoHeight('2.25rem')
-            ->favicon(asset('images/fixa-marca.svg'))
+            ->favicon(asset('images/fixa-marca.png'))
             ->darkMode(false)
             ->font('Atkinson Hyperlegible', url: asset('css/fixa-fuentes.css'), provider: LocalFontProvider::class)
-            // Escalas armadas a partir de la paleta de FIXA: 600 es #2d6073, 900 es #1f192f y 400 es #65b8a6.
+            // Escalas armadas a partir del logo: 600 es el verde hoja, 950 el verde bosque del texto y warning el naranja de la hoja.
             ->colors([
-                'primary' => [50 => '#eef6f7', 100 => '#d4e7eb', 200 => '#aed0d8', 300 => '#7fb1be', 400 => '#4f8ea0', 500 => '#3a7487', 600 => '#2d6073', 700 => '#27505f', 800 => '#23434f', 900 => '#1f3843', 950 => '#12232b'],
-                'gray' => [50 => '#f6f5f8', 100 => '#ecebf0', 200 => '#d9d6e1', 300 => '#bab5c7', 400 => '#8f88a3', 500 => '#6f6885', 600 => '#575071', 700 => '#443e5a', 800 => '#332d47', 900 => '#1f192f', 950 => '#15101f'],
-                'success' => [50 => '#effaf6', 100 => '#d6f2e5', 200 => '#b5e8c3', 300 => '#8ed4b8', 400 => '#65b8a6', 500 => '#459c8b', 600 => '#2f7f71', 700 => '#29665c', 800 => '#25524b', 900 => '#21443f', 950 => '#0f2825'],
+                'primary' => [50 => '#effaf2', 100 => '#d8f2df', 200 => '#b3e4c2', 300 => '#81cf9c', 400 => '#4fb474', 500 => '#2e9a58', 600 => '#1f7d47', 700 => '#1b643b', 800 => '#194f31', 900 => '#15412a', 950 => '#0b2418'],
+                'gray' => [50 => '#f5f7f2', 100 => '#e9eee5', 200 => '#d5ddd0', 300 => '#b3c0ae', 400 => '#889884', 500 => '#677a64', 600 => '#4f614d', 700 => '#3e4e3d', 800 => '#2a3a2e', 900 => '#172a20', 950 => '#0c1a13'],
+                'success' => [50 => '#f6fbe9', 100 => '#eaf5cf', 200 => '#d5eca3', 300 => '#b8dd6c', 400 => '#9ccc3c', 500 => '#7fb126', 600 => '#628c1b', 700 => '#4b6b19', 800 => '#3e5619', 900 => '#354919', 950 => '#1a2808'],
+                'warning' => [50 => '#fff6eb', 100 => '#ffe9cc', 200 => '#fdd096', 300 => '#fab05a', 400 => '#f5952f', 500 => '#ec7b12', 600 => '#d0600b', 700 => '#ac470d', 800 => '#8b3912', 900 => '#723112', 950 => '#3e1606'],
             ])
-            ->renderHook(PanelsRenderHook::STYLES_AFTER, fn (): HtmlString => new HtmlString('<link rel="stylesheet" href="'.e(asset('css/fixa-panel.css')).'">'))
+            // Estilos de escritorio y, aparte, los de tablet y celular (public/movil).
+            ->renderHook(PanelsRenderHook::STYLES_AFTER, fn (): HtmlString => new HtmlString('<link rel="stylesheet" href="'.e(asset('css/fixa-panel.css')).'">'
+                .'<link rel="stylesheet" href="'.e(asset('movil/css/panel.css')).'">'))
+            // Columna de marca junto al formulario de acceso.
+            ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START,fn (): string => view('panel.acceso-marca')->render(), scopes: Login::class)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            // Pages/Inicio.php reemplaza al Dashboard por defecto; cada perfil ve su resumen en Widgets/{Admin,Supervisor,Tecnico}.
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
-            ->pages([
-                Dashboard::class,
-            ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
-                AccountWidget::class,
-            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

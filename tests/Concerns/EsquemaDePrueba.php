@@ -115,6 +115,25 @@ trait EsquemaDePrueba
             $t->text('motivo')->nullable();
         });
 
+        Schema::create('programaciones', function (Blueprint $t) {
+            $t->id();
+            $t->foreignId('caso_id');
+            $t->foreignId('cuadrilla_id');
+            $t->date('fecha_prevista');
+            $t->string('motivo_reprogramacion')->nullable();
+            $t->boolean('vigente')->default(true);
+        });
+        Schema::create('intervenciones', function (Blueprint $t) {
+            $t->id();
+            $t->foreignId('caso_id');
+            $t->foreignId('tecnico_id');
+            $t->foreignId('supervisor_id')->nullable();
+            $t->timestamp('fecha')->useCurrent();
+            $t->text('trabajo_realizado');
+            $t->string('estado_validacion');
+            $t->text('observacion_validacion')->nullable();
+        });
+
         // Sustitutos de PostGIS: el punto se guarda como texto para poder comprobarlo.
         $pdo = DB::connection()->getPdo();
         $pdo->sqliteCreateFunction('ST_MakePoint', fn ($lng, $lat) => "POINT($lng $lat)", 2);
