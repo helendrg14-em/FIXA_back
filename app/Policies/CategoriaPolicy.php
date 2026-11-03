@@ -20,9 +20,12 @@ class CategoriaPolicy
         return $user->esAdministrador();
     }
 
+    /**
+     * RN-01: la versión 1 solo atiende 3 categorías.
+     */
     public function create(User $user): bool
     {
-        return $user->esAdministrador();
+        return $user->esAdministrador() && Categoria::count() < 3;
     }
 
     public function update(User $user, Categoria $categoria): bool

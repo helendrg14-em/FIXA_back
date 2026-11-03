@@ -22,11 +22,33 @@ En `.env`, completa `DB_HOST`, `DB_USERNAME` y `DB_PASSWORD` con los datos de Su
 
 ```bash
 php artisan migrate
-php artisan db:seed
+php artisan db:seed     # administrador, 3 unidades y 3 categorías
 php artisan serve
 ```
 
+Portal: http://localhost:8000
 Panel: http://localhost:8000/admin
+
+Base local para desarrollar (opcional, requiere Docker Desktop). En `.env` usa
+`DB_HOST=127.0.0.1`, `DB_PORT=5433`, `DB_SSLMODE=disable` y un `DB_DATABASE`, `DB_USERNAME`
+y `DB_PASSWORD` solo para esta base. Guarda antes los datos de Supabase en `.env.supabase`,
+que Git ignora.
+
+```bash
+docker compose up -d --wait
+php artisan migrate
+php artisan db:seed
+```
+
+Pruebas (usan SQLite en memoria, no tocan Supabase):
+
+```bash
+php artisan test
+```
+
+## Cuentas de funcionarios
+
+El administrador crea la cuenta y el sistema envía un enlace de un solo uso, válido por 48 horas, para que la persona cree su contraseña. Con `MAIL_MAILER=log` el enlace queda en `storage/logs/laravel.log`, que nunca se sube al repositorio.
 
 ## Reglas de seguridad del equipo
 
@@ -56,3 +78,18 @@ Panel: http://localhost:8000/admin
 
 El perfil **operador** (R07) existe en la base de datos pero todavía no puede entrar al panel.
 Para habilitarlo, edita `TipoUsuario::puedeEntrarAlPanel()`.
+
+## Despliegue en Render
+
+La imagen se construye con el `Dockerfile` y corre panel y portal en un solo contenedor.
+
+1. Crea un **Web Service** con runtime **Docker**, región **Ohio** (la misma de Supabase).
+2. Carga estas variables en Render, nunca en el repositorio:
+   - `APP_KEY`: una clave propia, generada con `php artisan key:generate --show`
+   - `APP_URL`: `https://tu-app.onrender.com`
+   - `DB_CONNECTION=pgsql`, `DB_HOST`, `DB_PORT=5432`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `DB_SSLMODE=require`
+   - `MAILGUN_DOMAIN`, `MAILGUN_SECRET`, `MAIL_FROM_ADDRESS`
+3. Usa `/up` como Health Check Path.
+4. Las migraciones se ejecutan desde una PC apuntando a Supabase. El contenedor nunca las corre al arrancar.
+
+Correo: se usa la API de Mailgun porque el plan gratis de Render bloquea SMTP. Con el dominio sandbox solo llega a 5 destinatarios autorizados.

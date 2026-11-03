@@ -2,8 +2,10 @@
 
 namespace App\Filament\Pages\Auth;
 
+use App\Auth\ServicioAutenticacion;
 use Filament\Auth\Pages\Login as BaseLogin;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
 use SensitiveParameter;
 
 /**
@@ -13,6 +15,11 @@ use SensitiveParameter;
  */
 class Login extends BaseLogin
 {
+    public function getHeading(): string|Htmlable
+    {
+        return 'Acceso de funcionarios';
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
@@ -24,9 +31,6 @@ class Login extends BaseLogin
 
     protected function getCredentialsFromFormData(#[SensitiveParameter] array $data): array
     {
-        return [
-            'correo' => mb_strtolower(trim($data['email'])),
-            'password' => $data['password'],
-        ];
+        return ServicioAutenticacion::getInstance()->credenciales($data['email'], $data['password']);
     }
 }

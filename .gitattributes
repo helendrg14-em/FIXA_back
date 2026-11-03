@@ -9,3 +9,6 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# Se ejecuta en Linux: no debe tener CRLF.
+docker/start.sh text eol=lf

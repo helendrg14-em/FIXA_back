@@ -1,0 +1,36 @@
+# Secretos: nunca entran en la imagen; en Render van como variables de entorno.
+.env
+.env.*
+!.env.example
+
+.git
+.github
+.claude
+.mcp.json
+.vscode
+.phpunit.cache
+.phpunit.result.cache
+
+# Se generan dentro de la imagen.
+vendor
+node_modules
+public/build
+public/hot
+public/css/filament
+public/js/filament
+public/fonts/filament
+public/storage
+bootstrap/cache/*.php
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+
+# No hacen falta en producción.
+tests
+docker-compose.yml
+Dockerfile
+.dockerignore
+*.mdj
+*.xlsx
+*.md
