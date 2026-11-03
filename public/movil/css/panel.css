@@ -1,0 +1,35 @@
+/* FIXA, panel de funcionarios: ajustes para tablet y celular.
+   Se carga después de public/css/fixa-panel.css (render hook en AdminPanelProvider). */
+
+/* Tablet horizontal */
+@media (max-width: 72rem) {
+    .fx-recorrido { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .fx-recorrido-etapa:nth-child(3)::after { display: none; }
+}
+
+/* Tablet vertical: login en una columna y escritorio apilado */
+@media (max-width: 64rem) {
+    .fi-simple-layout:has(.fx-login-marca) { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .fx-login-marca { min-height: 0; gap: 1.5rem; padding: 1.5rem 1.25rem 2rem; }
+    .fx-login-ciudad { width: 24rem; height: 24rem; right: -8rem; bottom: -10rem; opacity: .5; }
+    .fx-login-texto h2 { font-size: 1.75rem; }
+    .fx-login-texto > p, .fx-login-perfiles, .fx-login-nota { display: none; }
+    .fi-simple-layout:has(.fx-login-marca) .fi-simple-main-ctn { min-height: 0; padding-top: 1.5rem; place-items: start center; }
+
+    .fx-rejilla-admin, .fx-rejilla-supervisor, .fx-rejilla-tecnico { grid-template-columns: 1fr; }
+    .fx-saludo-ciudad { width: 22rem; height: 22rem; right: -7rem; opacity: .6; }
+}
+
+/* Celular */
+@media (max-width: 40rem) {
+    .fx-saludo { padding: 1.5rem 1.25rem; }
+    .fx-saludo-acciones, .fx-saludo-acciones .fi-btn { width: 100%; }
+    .fx-bloque { padding: 1.25rem 1rem; }
+    .fx-bloque-cabecera { flex-wrap: wrap; }
+    .fx-recorrido { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .fx-recorrido-etapa::after { display: none; }
+    .fx-barras li { grid-template-columns: 6rem minmax(0, 1fr) 2rem; gap: .6rem; }
+    .fx-fila { flex-wrap: wrap; }
+    .fx-fila-meta { width: 100%; text-align: start; padding-left: 3.4rem; }
+    .fx-datos dd { font-size: 1.625rem; }
+}
