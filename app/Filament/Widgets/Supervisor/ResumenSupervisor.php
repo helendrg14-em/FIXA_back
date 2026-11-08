@@ -34,8 +34,19 @@ class ResumenSupervisor extends ResumenDeInicio
 
         $abiertos = fn () => Caso::where('unidad_id', $usuario->unidad_id)->whereNotIn('estado', EstadoCaso::finales());
 
-        $porEstado = $abiertos()->selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
-        $porPrioridad = $abiertos()->selectRaw('prioridad, count(*) as total')->groupBy('prioridad')->pluck('total', 'prioridad');
+        // Todos los conteos salen de una sola consulta agrupada por estado y prioridad.
+        $conteos = $abiertos()->toBase()
+            ->selectRaw(
+                'estado, prioridad, count(*) as total,'
+                .' sum(case when vencido then 1 else 0 end) as vencidos,'
+                .' sum(case when not vencido and fecha_objetivo between ? and ? then 1 else 0 end) as por_vencer',
+                [now(), now()->addDays(2)],
+            )
+            ->groupBy('estado', 'prioridad')
+            ->get();
+
+        $porEstado = $conteos->groupBy('estado')->map(fn ($filas): int => (int) $filas->sum('total'));
+        $porPrioridad = $conteos->whereNotNull('prioridad')->groupBy('prioridad')->map(fn ($filas): int => (int) $filas->sum('total'));
 
         return [
             ...$datos,
@@ -50,9 +61,9 @@ class ResumenSupervisor extends ResumenDeInicio
                 'nombre' => $p->getLabel(),
                 'total' => (int) ($porPrioridad[$p->value] ?? 0),
             ]),
-            'sinPrioridad' => $abiertos()->whereNull('prioridad')->count(),
-            'vencidos' => $abiertos()->where('vencido', true)->count(),
-            'porVencer' => $abiertos()->where('vencido', false)->whereBetween('fecha_objetivo', [now(), now()->addDays(2)])->count(),
+            'sinPrioridad' => (int) $conteos->whereNull('prioridad')->sum('total'),
+            'vencidos' => (int) $conteos->sum('vencidos'),
+            'porVencer' => (int) $conteos->sum('por_vencer'),
             'urgentes' => $abiertos()->with('categoria:id,nombre')->whereNotNull('fecha_objetivo')
                 ->orderByDesc('vencido')->orderBy('fecha_objetivo')->limit(6)
                 ->get(['id', 'categoria_id', 'estado', 'prioridad', 'vencido', 'fecha_objetivo']),

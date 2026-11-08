@@ -21,8 +21,15 @@ class ResumenAdmin extends ResumenDeInicio
 
     protected function getViewData(): array
     {
-        $activos = User::where('activo', true)->get(['id', 'tipo', 'nombres', 'apellidos', 'debe_registrar_password', 'fecha_creacion']);
-        $abiertos = Caso::whereNotIn('estado', EstadoCaso::finales());
+        // Una consulta por tabla: con la base en otro servidor, cada ida y vuelta cuenta.
+        $usuarios = User::get(['id', 'tipo', 'nombres', 'apellidos', 'activo', 'debe_registrar_password', 'fecha_creacion']);
+        $activos = $usuarios->where('activo', true);
+        $categorias = Categoria::toBase()
+            ->selectRaw('count(*) as total, sum(case when activa then 1 else 0 end) as activas')
+            ->first();
+        $casos = Caso::whereNotIn('estado', EstadoCaso::finales())->toBase()
+            ->selectRaw('count(*) as abiertos, sum(case when vencido then 1 else 0 end) as vencidos')
+            ->first();
 
         return [
             ...$this->momento(),
@@ -30,14 +37,14 @@ class ResumenAdmin extends ResumenDeInicio
             'equipo' => collect([TipoUsuario::Administrador, TipoUsuario::Supervisor, TipoUsuario::Tecnico])
                 ->map(fn (TipoUsuario $tipo): array => ['perfil' => $tipo->getLabel(), 'total' => $activos->where('tipo', $tipo)->count()]),
             'totalActivos' => $activos->count(),
-            'inactivos' => User::where('activo', false)->count(),
+            'inactivos' => $usuarios->where('activo', false)->count(),
             'sinContrasena' => $activos->where('debe_registrar_password', true)->sortByDesc('fecha_creacion')->take(5)->values(),
             'totalSinContrasena' => $activos->where('debe_registrar_password', true)->count(),
-            'categoriasActivas' => Categoria::where('activa', true)->count(),
-            'categorias' => Categoria::count(),
+            'categoriasActivas' => (int) $categorias->activas,
+            'categorias' => (int) $categorias->total,
             'feriados' => Feriado::whereDate('fecha', '>=', today())->orderBy('fecha')->limit(4)->get(),
-            'casosAbiertos' => (clone $abiertos)->count(),
-            'casosVencidos' => (clone $abiertos)->where('vencido', true)->count(),
+            'casosAbiertos' => (int) $casos->abiertos,
+            'casosVencidos' => (int) $casos->vencidos,
             'urlUsuarios' => UsuarioResource::getUrl('index'),
             'urlNuevoUsuario' => UsuarioResource::getUrl('create'),
             'urlCategorias' => CategoriaResource::getUrl('index'),
