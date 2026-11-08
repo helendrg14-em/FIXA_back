@@ -1,3 +1,6 @@
 @font-face { font-family: 'Atkinson Hyperlegible'; src: url('../fonts/fixa/atkinson-hyperlegible-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'Atkinson Hyperlegible'; src: url('../fonts/fixa/atkinson-hyperlegible-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; }
 @font-face { font-family: 'Bricolage Grotesque'; src: url('../fonts/fixa/bricolage-grotesque-latin-wght-normal.woff2') format('woff2'); font-weight: 200 800; font-display: swap; }
+/* Atkinson dibuja el 0 con una raya. Los números (U+0030-0039) se toman de Bricolage, que lo tiene limpio.
+   Va al final: con unicode-range, la última regla declarada gana para esos caracteres. */
+@font-face { font-family: 'Atkinson Hyperlegible'; src: url('../fonts/fixa/bricolage-grotesque-latin-wght-normal.woff2') format('woff2'); font-weight: 200 800; font-display: swap; unicode-range: U+0030-0039; }

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 /**
- * Builder: un reporte tiene datos comunes, datos de su categoría y datos que dependen del
+ * Un reporte tiene datos comunes, datos de su categoría y datos que dependen del
  * canal. Se arma paso a paso y registrar() recién valida el conjunto y lo guarda de una
  * sola vez (RNF: guardado atómico e idempotente).
  */
@@ -93,9 +93,6 @@ class ReporteBuilder
         return $this->con('correo_contacto', $correo)->con('token_dispositivo', $tokenDispositivo);
     }
 
-    /**
-     * La envía el cliente; reenviar la misma solicitud devuelve el reporte ya creado.
-     */
     public function conClaveIdempotencia(string $clave): self
     {
         return $this->con('clave_idempotencia', $clave);
@@ -114,7 +111,6 @@ class ReporteBuilder
         try {
             return DB::transaction(fn (): ReporteRegistrado => $this->guardar($datos));
         } catch (UniqueConstraintViolationException $e) {
-            // Dos envíos simultáneos: el otro ganó la carrera y este devuelve su reporte.
             $existente = Reporte::where('clave_idempotencia', $datos['clave_idempotencia'])->first();
 
             return $existente ? new ReporteRegistrado($existente, null) : throw $e;
