@@ -10,6 +10,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Tables\Table;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -21,6 +22,19 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    /** Filas por página; con esta cantidad o menos la tabla se muestra entera, sin paginación. */
+    private const FILAS_POR_PAGINA = 10;
+
+    public function boot(): void
+    {
+        // Paginar solo cuando hay más registros que una página: con 2 feriados o 3 usuarios sobra.
+        // Cuenta sobre la consulta ya filtrada, así la búsqueda también la quita si quedan pocos.
+        Table::configureUsing(fn (Table $table) => $table
+            ->paginationPageOptions([self::FILAS_POR_PAGINA, 25, 50])
+            ->defaultPaginationPageOption(self::FILAS_POR_PAGINA)
+            ->paginated(fn (Table $table): bool => ($table->getLivewire()->getFilteredTableQuery()?->count() ?? 0) > self::FILAS_POR_PAGINA));
+    }
+
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -28,14 +42,17 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName('FIXA')
+            // Navegación sin recargar la página: entre secciones del panel solo cambia el contenido.
+            ->spa()
             // Sin ->registration(): las cuentas las crea solo el administrador (R03).
             ->login(Login::class)
             // Dos versiones del logo: la clara va sobre la barra lateral verde oscura (fixa-panel.css).
             ->brandLogo(fn (): HtmlString => new HtmlString(view('panel.logo')->render()))
             ->brandLogoHeight('2.25rem')
-            ->favicon(asset('images/fixa-marca.png'))
+            ->favicon(recurso('images/fixa-marca.png'))
             ->darkMode(false)
-            ->font('Atkinson Hyperlegible', url: asset('css/fixa-fuentes.css'), provider: LocalFontProvider::class)
+            ->font('Atkinson Hyperlegible', url: recurso('css/fixa-fuentes.css'), provider: LocalFontProvider::class)
+            ->renderHook(PanelsRenderHook::HEAD_START, fn (): string => view('partes.precarga-fuentes')->render())
             // Escalas armadas a partir del logo: 600 es el verde hoja, 950 el verde bosque del texto y warning el naranja de la hoja.
             ->colors([
                 'primary' => [50 => '#effaf2', 100 => '#d8f2df', 200 => '#b3e4c2', 300 => '#81cf9c', 400 => '#4fb474', 500 => '#2e9a58', 600 => '#1f7d47', 700 => '#1b643b', 800 => '#194f31', 900 => '#15412a', 950 => '#0b2418'],
@@ -44,8 +61,8 @@ class AdminPanelProvider extends PanelProvider
                 'warning' => [50 => '#fff6eb', 100 => '#ffe9cc', 200 => '#fdd096', 300 => '#fab05a', 400 => '#f5952f', 500 => '#ec7b12', 600 => '#d0600b', 700 => '#ac470d', 800 => '#8b3912', 900 => '#723112', 950 => '#3e1606'],
             ])
             // Estilos de escritorio y, aparte, los de tablet y celular (public/movil).
-            ->renderHook(PanelsRenderHook::STYLES_AFTER, fn (): HtmlString => new HtmlString('<link rel="stylesheet" href="'.e(asset('css/fixa-panel.css')).'">'
-                .'<link rel="stylesheet" href="'.e(asset('movil/css/panel.css')).'">'))
+            ->renderHook(PanelsRenderHook::STYLES_AFTER, fn (): HtmlString => new HtmlString('<link rel="stylesheet" href="'.e(recurso('css/fixa-panel.css')).'">'
+                .'<link rel="stylesheet" href="'.e(recurso('movil/css/panel.css')).'">'))
             // Columna de marca junto al formulario de acceso.
             ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START,fn (): string => view('panel.acceso-marca')->render(), scopes: Login::class)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
