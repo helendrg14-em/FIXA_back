@@ -9,7 +9,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use SensitiveParameter;
 
 /**
- * R01: login de funcionarios con correo y contraseña. Sin "Recordarme", porque la
+ * Login de funcionarios con correo y contraseña. Sin "Recordarme", porque la
  * sesion debe expirar a los 15 minutos de inactividad. Filament ya limita a 5 intentos
  * por minuto y rechaza las cuentas donde canAccessPanel() devuelve false.
  */

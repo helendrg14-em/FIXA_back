@@ -67,11 +67,9 @@ body.fi-body { font-size: 1rem; color: var(--fx-tinta); }
 .fi-sidebar-item-grouped-border-part { background-color: rgba(233, 238, 229, .2); }
 .fi-sidebar .fi-icon-btn .fi-icon { color: #dfe8d8; }
 
-/* Barra superior */
-.fi-topbar.fi-topbar, .fi-topbar nav {
-    background-color: rgba(245, 247, 242, .86);
-    backdrop-filter: saturate(1.4) blur(10px);
-}
+/* Barra superior. Sin backdrop-filter: convierte la barra en contenedor de los paneles fixed
+   y el menú del usuario (HR) se abría hacia arriba, fuera de la pantalla. */
+.fi-topbar.fi-topbar, .fi-topbar nav { background-color: var(--fx-papel); }
 .fi-topbar.fi-topbar { box-shadow: inset 0 -1px 0 var(--fx-linea); }
 
 /* Superficies: un borde fino, sin sombras de más */

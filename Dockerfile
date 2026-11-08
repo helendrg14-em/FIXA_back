@@ -13,7 +13,7 @@ RUN apt-get update \
 
 COPY docker/php.ini "$PHP_INI_DIR/conf.d/zz-fixa.ini"
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
-RUN a2enmod rewrite headers \
+RUN a2enmod rewrite headers deflate \
     && sed -i 's/^Listen 80$/Listen ${PORT}/' /etc/apache2/ports.conf
 
 ENV PORT=10000 \
