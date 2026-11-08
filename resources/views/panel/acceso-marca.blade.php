@@ -1,6 +1,6 @@
 {{-- Columna de marca del login del panel (render hook SIMPLE_LAYOUT_START). --}}
 <aside class="fx-login-marca">
-    <img class="fx-login-logo" src="{{ asset('images/fixa-logo-claro.png') }}" alt="FIXA" width="144" height="40">
+    <img class="fx-login-logo" src="{{ recurso('images/fixa-logo-claro.webp') }}" alt="FIXA" width="144" height="40">
 
     <div class="fx-login-texto">
         <h2>Cada reporte de la ciudad, atendido hasta el cierre.</h2>

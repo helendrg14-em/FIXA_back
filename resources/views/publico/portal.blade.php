@@ -14,7 +14,7 @@
 
 <header class="barra">
     <a href="{{ route('portal') }}" class="marca" aria-label="FIXA, inicio">
-        <img src="{{ asset('images/fixa-logo.png') }}" alt="" width="144" height="40">
+        <img src="{{ recurso('images/fixa-logo.webp') }}" alt="" width="144" height="40">
     </a>
     <button class="barra-menu" type="button" aria-expanded="false" aria-controls="barra-enlaces" aria-label="Abrir menú">
         <x-fixa.icono nombre="menu" class="abrir" />
@@ -57,8 +57,8 @@
 
             <div class="portada-foto">
                 {{-- Santa Cruz de noche desde el aire. Provisional: aquí irá el mapa de OpenStreetMap con los reportes. --}}
-                <img class="portada-ciudad" src="{{ asset('images/santa-cruz-anillos.jpg') }}"
-                     alt="" width="760" height="640" decoding="async">
+                <img class="portada-ciudad" src="{{ recurso('images/santa-cruz-anillos.webp') }}"
+                     alt="" width="760" height="640" decoding="async" fetchpriority="high">
             </div>
 
             {{-- Tarjeta ilustrativa: muestra cómo se ve el seguimiento, no un reporte real. --}}
@@ -189,12 +189,12 @@
                 </span>
             @endif
         </div>
-        <img class="descarga-marca" src="{{ asset('images/fixa-isotipo.png') }}" alt="" width="344" height="240" loading="lazy">
+        <img class="descarga-marca" src="{{ recurso('images/fixa-isotipo.webp') }}" alt="" width="344" height="240" loading="lazy">
     </section>
 </main>
 
 <footer class="pie">
-    <img class="pie-logo" src="{{ asset('images/fixa-logo.png') }}" alt="FIXA" width="144" height="40" loading="lazy">
+    <img class="pie-logo" src="{{ recurso('images/fixa-logo.webp') }}" alt="FIXA" width="144" height="40" loading="lazy">
     <p class="pie-texto">No es un canal oficial del Gobierno Autónomo Municipal.</p>
     <ul class="pie-enlaces">
         <li><a href="#reportes">Qué reportar</a></li>
@@ -231,5 +231,5 @@
         observador.observe(pasos);
     })();
 </script>
-<script src="{{ asset('movil/js/menu.js') }}" defer></script>
+<script src="{{ recurso('movil/js/menu.js') }}" defer></script>
 @endpush
