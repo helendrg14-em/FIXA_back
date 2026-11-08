@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 /**
- * un reporte tiene datos comunes, datos de su categoría y datos que dependen del
+ * Un reporte tiene datos comunes, datos de su categoría y datos que dependen del
  * canal. Se arma paso a paso y registrar() recién valida el conjunto y lo guarda de una
  * sola vez (RNF: guardado atómico e idempotente).
  */
@@ -65,30 +65,34 @@ class ReporteBuilder
     {
         return $this->con('numero_luminarias', $numero);
     }
+
     public function conAvisoCobranza(?string $codigo): self
     {
         return $this->con('codigo_aviso_cobranza', $codigo);
     }
+
     public function conFoto(string $url, string $publicId): self
     {
         $this->fotos[] = ['url' => $url, 'public_id' => $publicId];
 
         return $this;
     }
+
     public function sinFoto(string $motivo): self
     {
         return $this->con('motivo_sin_foto', trim($motivo));
     }
+
     public function registradoPor(int $operadorId): self
     {
         return $this->con('operador_id', $operadorId);
     }
+
     public function conContacto(?string $correo, ?string $tokenDispositivo = null): self
     {
         return $this->con('correo_contacto', $correo)->con('token_dispositivo', $tokenDispositivo);
     }
 
-    
     public function conClaveIdempotencia(string $clave): self
     {
         return $this->con('clave_idempotencia', $clave);
@@ -107,7 +111,6 @@ class ReporteBuilder
         try {
             return DB::transaction(fn (): ReporteRegistrado => $this->guardar($datos));
         } catch (UniqueConstraintViolationException $e) {
-            
             $existente = Reporte::where('clave_idempotencia', $datos['clave_idempotencia'])->first();
 
             return $existente ? new ReporteRegistrado($existente, null) : throw $e;
