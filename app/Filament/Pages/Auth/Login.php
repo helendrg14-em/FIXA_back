@@ -39,10 +39,12 @@ class Login extends BaseLogin
     protected function getPasswordFormComponent(): Component
     {
         return parent::getPasswordFormComponent()
-            ->hint(new HtmlString(Blade::render(
-                '<x-filament::link :href="$url">¿Olvidaste tu contraseña?</x-filament::link>',
-                ['url' => route('cuenta.recuperar')],
-            )));
+            ->belowContent(Schema::end([
+                new HtmlString(Blade::render(
+                    '<x-filament::link :href="$url">¿Olvidaste tu contraseña?</x-filament::link>',
+                    ['url' => route('cuenta.recuperar')],
+                )),
+            ]));
     }
 
     protected function getCredentialsFromFormData(#[SensitiveParameter] array $data): array

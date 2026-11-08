@@ -2,11 +2,14 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Concerns\SinSeguimientoDeClics;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class RecuperarPassword extends Notification
 {
+    use SinSeguimientoDeClics;
+
     public function __construct(private readonly string $token) {}
 
     /**
@@ -19,7 +22,7 @@ class RecuperarPassword extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        return $this->sinSeguimientoDeClics(new MailMessage)
             ->subject('Cambia tu contraseña de FIXA')
             ->greeting("Hola, {$notifiable->nombres}")
             ->line('Recibimos una solicitud para cambiar la contraseña de tu cuenta de FIXA.')

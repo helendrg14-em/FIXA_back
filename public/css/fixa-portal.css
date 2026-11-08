@@ -320,30 +320,46 @@ html { scrollbar-color: var(--hoja-viva) var(--papel-2); }
 
 /* ---------- Acceso (crear contraseña) ---------- */
 .acceso {
-    min-height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: 100dvh; display: flex; flex-direction: column; gap: clamp(1rem, 2.2vh, 1.75rem);
+    padding: clamp(.75rem, 2vh, 1.5rem) var(--margen) clamp(1rem, 3vh, 2.25rem);
+    background: radial-gradient(50% 60% at 0% 0%, var(--menta), transparent 70%),
+                radial-gradient(40% 50% at 100% 100%, var(--menta-2), transparent 70%), var(--papel);
+}
+.acceso-cabecera {
+    width: min(100%, 78rem); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.acceso-logo { display: inline-flex; min-height: 44px; align-items: center; }
+.acceso-logo img { height: 36px; width: auto; }
+.acceso-entrar { min-height: 2.75rem; padding: .55rem 1.25rem; }
+.acceso-caja {
+    flex: 1; width: min(100%, 78rem); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 34fr) minmax(0, 44fr);
+    background: #fff; border-radius: 28px; overflow: hidden;
+    box-shadow: 0 1px 0 var(--linea), 0 30px 60px -36px rgba(11, 36, 24, .45);
 }
 .acceso-marca {
     position: relative; overflow: hidden; isolation: isolate;
     display: flex; flex-direction: column; justify-content: space-between; gap: 2rem;
-    padding: clamp(2rem, 4vw, 3.5rem); color: #e9f0e3;
+    padding: clamp(1.5rem, 4vh, 2.75rem) clamp(1.75rem, 3vw, 2.75rem); color: #e9f0e3;
     background: radial-gradient(90% 70% at 100% 100%, rgba(46, 154, 88, .38), transparent 65%),
                 linear-gradient(160deg, var(--bosque-2), var(--bosque) 70%);
 }
-.acceso-marca > img { height: 40px; width: auto; align-self: flex-start; }
-.acceso-marca h2 { font-size: clamp(2rem, 3.6vw, 3.25rem); color: #fff; max-width: 28rem; }
-.acceso-marca p { margin-top: 1rem; color: #c3d4bf; max-width: 26rem; }
+.acceso-isotipo {
+    display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 12px; background: #fff;
+    box-shadow: 0 10px 24px -12px rgba(0, 0, 0, .5);
+}
+.acceso-isotipo img { width: 1.8rem; height: auto; }
+.acceso-etiqueta { font-size: .8125rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--lima); }
+.acceso-marca h2 { margin-top: .75rem; font-size: clamp(1.75rem, min(2.6vw, 4.6vh), 2.375rem); color: #fff; max-width: 24rem; }
+.acceso-marca p:not(.acceso-etiqueta) { margin-top: 1rem; color: #c3d4bf; max-width: 24rem; }
+.acceso-marca p.acceso-nota { margin: 0; font-size: .875rem; font-weight: 700; color: #a9bfa5; }
 .acceso-ciudad {
-    position: absolute; z-index: -1; width: 44rem; height: 44rem; right: -16rem; bottom: -14rem;
-    mix-blend-mode: screen; opacity: .9;
+    position: absolute; z-index: -1; width: 36rem; height: 36rem; right: -15rem; bottom: -13rem;
+    mix-blend-mode: screen; opacity: .8;
     -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
     mask-image: radial-gradient(closest-side, #000 55%, transparent);
 }
-.acceso-pagina { display: grid; place-items: center; padding: 2.5rem clamp(1.25rem, 5vw, 4rem); }
-.acceso-tarjeta {
-    width: min(100%, 28rem); background: #fff; border-radius: 20px;
-    padding: clamp(1.75rem, 5vw, 2.5rem);
-    box-shadow: 0 1px 0 var(--linea), 0 24px 48px -28px rgba(11, 36, 24, .35);
-}
+.acceso-pagina { display: grid; place-items: center; padding: clamp(1.5rem, 4vh, 3rem) clamp(1.25rem, 5vw, 4rem); }
+.acceso-tarjeta { width: min(100%, 26rem); }
 .acceso-tarjeta h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.025em; }
 .acceso-tarjeta > p { margin-top: .6rem; color: var(--tinta-2); }
 

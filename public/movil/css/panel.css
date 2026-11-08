@@ -9,12 +9,20 @@
 
 /* Tablet vertical: login en una columna y escritorio apilado */
 @media (max-width: 64rem) {
-    .fi-simple-layout:has(.fx-login-marca) { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-    .fx-login-marca { min-height: 0; gap: 1.5rem; padding: 1.5rem 1.25rem 2rem; }
+    /* La tarjeta se apila: el panel verde queda arriba como encabezado corto. */
+    .fi-simple-layout:has(.fx-login-marca) {
+        grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; row-gap: 0;
+        padding-left: 1rem; padding-right: 1rem;
+    }
+    .fx-login-cabecera { grid-column: 1; margin-bottom: 1.25rem; }
+    .fx-login-marca { grid-column: 1; grid-row: 2; border-radius: 22px 22px 0 0; gap: 1rem; padding: 1.5rem 1.25rem 1.75rem; box-shadow: none; }
+    .fx-login-isotipo { display: none; }
     .fx-login-ciudad { width: 24rem; height: 24rem; right: -8rem; bottom: -10rem; opacity: .5; }
-    .fx-login-texto h2 { font-size: 1.75rem; }
-    .fx-login-texto > p, .fx-login-perfiles, .fx-login-nota { display: none; }
-    .fi-simple-layout:has(.fx-login-marca) .fi-simple-main-ctn { min-height: 0; padding-top: 1.5rem; place-items: start center; }
+    .fx-login-texto h2 { font-size: 1.625rem; }
+    .fx-login-texto > p:not(.fx-login-etiqueta), .fx-login-perfiles, .fx-login-nota { display: none; }
+    .fi-simple-layout:has(.fx-login-marca) .fi-simple-main-ctn {
+        grid-column: 1; grid-row: 3; border-radius: 0 0 22px 22px; padding: 1.75rem 1.25rem 2rem; place-items: start center;
+    }
 
     .fx-rejilla-admin, .fx-rejilla-supervisor, .fx-rejilla-tecnico { grid-template-columns: 1fr; }
     .fx-saludo-ciudad { width: 22rem; height: 22rem; right: -7rem; opacity: .6; }

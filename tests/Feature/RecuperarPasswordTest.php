@@ -6,10 +6,12 @@ use App\Enums\TipoUsuario;
 use App\Filament\Resources\Usuarios\Pages\ListUsuarios;
 use App\Models\User;
 use App\Notifications\RecuperarPassword;
+use App\Notifications\RegistrarPassword;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
+use Symfony\Component\Mime\Email;
 use Tests\Concerns\EsquemaDePrueba;
 use Tests\TestCase;
 
@@ -134,5 +136,17 @@ class RecuperarPasswordTest extends TestCase
         Livewire::test(ListUsuarios::class)
             ->assertTableActionHidden('restablecer', $pendiente)
             ->assertTableActionVisible('reenviar', $pendiente);
+    }
+
+    public function test_los_correos_de_contrasena_no_pasan_por_el_seguimiento_de_mailgun(): void
+    {
+        foreach ([new RecuperarPassword('token'), new RegistrarPassword('token')] as $notificacion) {
+            $correo = new Email;
+            foreach ($notificacion->toMail($this->tecnico)->callbacks as $callback) {
+                $callback($correo);
+            }
+
+            $this->assertSame('no', $correo->getHeaders()->get('o:tracking-clicks')?->getBodyAsString());
+        }
     }
 }
