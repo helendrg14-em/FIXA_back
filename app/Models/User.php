@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Enums\TipoUsuario;
+use App\Notifications\RecuperarPassword;
 use App\Notifications\RegistrarPassword;
+use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
@@ -125,18 +127,45 @@ class User extends Authenticatable implements FilamentUser, HasName
     }
 
     /**
-     * Crea un enlace de un solo uso que vence en 48 horas. Solo se guarda el hash del token.
+     * Cuenta nueva: enlace de un solo uso que vence en 48 horas.
      */
     public function enviarEnlaceRegistro(): void
+    {
+        $this->notify(new RegistrarPassword($this->nuevoToken(now()->addHours(48))));
+    }
+
+    /**
+     * Contraseña olvidada: enlace de un solo uso que vence en 60 minutos. La contraseña
+     * actual sigue sirviendo hasta que se cree la nueva.
+     */
+    public function enviarEnlaceRecuperacion(): void
+    {
+        $this->notify(new RecuperarPassword($this->nuevoToken(now()->addMinutes(60))));
+    }
+
+    /**
+     * El enlace se arma con APP_URL y no con el host de la petición: así nadie puede
+     * pedir una recuperación con una cabecera Host falsa y recibir un enlace a su sitio.
+     */
+    public function enlaceContrasena(string $token): string
+    {
+        return rtrim((string) config('app.url'), '/')
+            .route('cuenta.contrasena', ['usuario' => $this->id, 'token' => $token], absolute: false);
+    }
+
+    /**
+     * Solo se guarda el hash del token, y uno nuevo anula el anterior.
+     */
+    private function nuevoToken(CarbonInterface $vence): string
     {
         $token = Str::random(64);
 
         $this->forceFill([
             'token_recuperacion_hash' => hash('sha256', $token),
-            'token_expira' => now()->addHours(48),
+            'token_expira' => $vence,
         ])->save();
 
-        $this->notify(new RegistrarPassword($token));
+        return $token;
     }
 
     public function validarToken(string $token): bool

@@ -9,7 +9,8 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 /**
- * El funcionario crea su contraseña con el enlace que recibe por correo. Cualquier enlace
+ * El funcionario crea su contraseña con el enlace que recibe por correo, al recibir su
+ * cuenta o al recuperar una contraseña olvidada. Cualquier enlace
  * invalido da la misma respuesta, para no revelar si una cuenta existe.
  */
 class RegistrarPasswordController extends Controller
@@ -21,6 +22,8 @@ class RegistrarPasswordController extends Controller
         return view('cuenta.contrasena', [
             'usuario' => $user->id,
             'token' => $request->query('token'),
+            // Cuenta nueva o contraseña olvidada: mismo formulario, distinto título.
+            'nueva' => $user->debe_registrar_password,
         ]);
     }
 

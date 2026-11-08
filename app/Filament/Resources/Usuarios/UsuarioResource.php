@@ -104,6 +104,24 @@ class UsuarioResource extends Resource
                     ->action(function (User $record): void {
                         self::enviarEnlace($record);
                     }),
+                Action::make('restablecer')->label('Restablecer contraseña')->icon(Heroicon::OutlinedKey)
+                    ->visible(fn (User $record): bool => $record->activo && ! $record->debe_registrar_password)
+                    ->authorize(fn (User $record): bool => Gate::allows('update', $record))
+                    ->requiresConfirmation()
+                    ->modalHeading('Restablecer contraseña')
+                    // El administrador nunca ve ni escribe la contraseña: solo dispara el enlace.
+                    ->modalDescription(fn (User $record): string => "Enviaremos a {$record->correo} un enlace para crear una contraseña nueva. Vence en 60 minutos; mientras tanto, la contraseña actual sigue funcionando.")
+                    ->modalSubmitActionLabel('Enviar enlace')
+                    ->action(function (User $record): void {
+                        try {
+                            $record->enviarEnlaceRecuperacion();
+                            Notification::make()->title('Enlace enviado')->body("Se envió a {$record->correo}.")->success()->send();
+                        } catch (Throwable $e) {
+                            report($e);
+                            Notification::make()->title('No se pudo enviar el correo')
+                                ->body('Revisa la configuración de correo y vuelve a intentarlo.')->warning()->persistent()->send();
+                        }
+                    }),
                 Action::make('desactivar')->label('Desactivar')->icon(Heroicon::OutlinedNoSymbol)->color('danger')
                     ->visible(fn (User $record): bool => $record->activo)
                     ->authorize(fn (User $record): bool => Gate::allows('desactivar', $record))
