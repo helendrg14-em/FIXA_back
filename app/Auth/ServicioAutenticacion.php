@@ -18,11 +18,8 @@ use SensitiveParameter;
 final class ServicioAutenticacion
 {
     private static ?self $instancia = null;
-
     private function __construct() {}
-
     private function __clone() {}
-
     public function __wakeup(): void
     {
         throw new LogicException('El Singleton de autenticación no se puede deserializar.');
@@ -36,7 +33,6 @@ final class ServicioAutenticacion
     public function usuario(): ?User
     {
         $usuario = Auth::user();
-
         return $usuario instanceof User ? $usuario : null;
     }
 

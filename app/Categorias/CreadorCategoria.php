@@ -13,7 +13,6 @@ use Illuminate\Validation\Rule;
 abstract class CreadorCategoria
 {
     public const TIPO_OTRO = 'otro';
-
     abstract protected function crearDefinicion(): DefinicionCategoria;
 
     public static function para(CodigoCategoria $codigo): self
