@@ -4,8 +4,11 @@ namespace App\Filament\Pages\Auth;
 
 use App\Auth\ServicioAutenticacion;
 use Filament\Auth\Pages\Login as BaseLogin;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\HtmlString;
 use SensitiveParameter;
 
 /**
@@ -27,6 +30,19 @@ class Login extends BaseLogin
                 $this->getEmailFormComponent(),
                 $this->getPasswordFormComponent(),
             ]);
+    }
+
+    /**
+     * Filament solo ofrece su propio "¿Olvidaste tu contraseña?", que pide la tabla de
+     * Laravel. Aquí lleva a la recuperación de FIXA, que usa el mismo enlace por correo.
+     */
+    protected function getPasswordFormComponent(): Component
+    {
+        return parent::getPasswordFormComponent()
+            ->hint(new HtmlString(Blade::render(
+                '<x-filament::link :href="$url">¿Olvidaste tu contraseña?</x-filament::link>',
+                ['url' => route('cuenta.recuperar')],
+            )));
     }
 
     protected function getCredentialsFromFormData(#[SensitiveParameter] array $data): array

@@ -386,6 +386,9 @@ html { scrollbar-color: var(--hoja-viva) var(--papel-2); }
 .listo-icono { display: block; width: 4rem; height: 4rem; margin-bottom: 1.25rem; }
 .listo-icono circle { fill: #e3f2d0; }
 .listo-icono path { fill: none; stroke: var(--hoja); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 30; }
+.acceso-volver { margin-top: 1.25rem; text-align: center; }
+.acceso-volver a { display: inline-flex; align-items: center; min-height: 44px; color: var(--hoja-oscura); font-weight: 700; }
+.acceso-volver a:hover { color: var(--bosque); }
 
 
 /* ---------- Movimiento ---------- */

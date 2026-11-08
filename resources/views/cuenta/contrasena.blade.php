@@ -1,6 +1,6 @@
 @extends('layouts.publico')
 
-@section('titulo', 'Crea tu contraseña | FIXA')
+@section('titulo', ($nueva ? 'Crea tu contraseña' : 'Cambia tu contraseña').' | FIXA')
 @section('noindex', true)
 
 @section('contenido')
@@ -9,8 +9,13 @@
 
     <main class="acceso-pagina">
         <div class="acceso-tarjeta">
-            <h1>Crea tu contraseña</h1>
-            <p>La usarás para entrar al panel de FIXA con tu correo institucional.</p>
+            @if ($nueva)
+                <h1>Crea tu contraseña</h1>
+                <p>La usarás para entrar al panel de FIXA con tu correo institucional.</p>
+            @else
+                <h1>Cambia tu contraseña</h1>
+                <p>Desde ahora entrarás al panel con esta contraseña. La anterior dejará de funcionar.</p>
+            @endif
 
             <form method="POST" action="{{ route('cuenta.contrasena.guardar', ['usuario' => $usuario]) }}">
                 @csrf
