@@ -91,49 +91,75 @@ body.fi-body { font-size: 1rem; color: var(--fx-tinta); }
 .fi-badge { font-weight: 700; }
 
 /* ---------- Acceso (login) ---------- */
+/* Mismo diseño que las páginas de cuenta: barra con el logo y una tarjeta centrada de dos columnas
+   (marca verde a la izquierda, formulario a la derecha). La tarjeta se arma con la rejilla porque
+   Filament no deja envolver la marca y el formulario en un mismo elemento. */
 .fi-simple-layout:has(.fx-login-marca) {
-    display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    align-items: stretch; background: var(--fx-papel);
+    min-height: 100dvh; display: grid; align-items: stretch;
+    grid-template-columns: 1fr minmax(0, 34rem) minmax(0, 44rem) 1fr; grid-template-rows: auto 1fr;
+    row-gap: clamp(1rem, 2.2vh, 1.75rem);
+    padding: clamp(.75rem, 2vh, 1.5rem) clamp(1.25rem, 5vw, 5rem) clamp(1rem, 3vh, 2.25rem);
+    background: radial-gradient(50% 60% at 0% 0%, #edf5e8, transparent 70%),
+                radial-gradient(40% 50% at 100% 100%, #dcebd3, transparent 70%), var(--fx-papel);
 }
+.fx-login-cabecera {
+    grid-column: 2 / 4; grid-row: 1; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.fx-login-cabecera-logo { display: inline-flex; min-height: 44px; align-items: center; }
+.fx-login-cabecera-logo img { height: 36px; width: auto; }
+.fx-login-portal {
+    display: inline-flex; align-items: center; min-height: 2.75rem; padding: .55rem 1.25rem; border-radius: 12px;
+    font-weight: 700; color: #17643a; background: #fff; box-shadow: inset 0 0 0 2px var(--fx-hoja-viva);
+    transition: background-color .15s ease;
+}
+.fx-login-portal:hover { background: #edf5e8; }
 .fi-simple-layout:has(.fx-login-marca) .fi-simple-main-ctn {
-    display: grid; place-items: center; padding: 2.5rem clamp(1.25rem, 5vw, 4rem); min-height: 100dvh;
+    grid-column: 3; grid-row: 2; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: clamp(1.5rem, 4vh, 3rem) clamp(1.25rem, 5vw, 4rem);
+    background: #fff; border-radius: 0 28px 28px 0;
+    box-shadow: 0 1px 0 var(--fx-linea), 0 30px 60px -36px rgba(11, 36, 24, .45);
 }
 .fi-simple-layout:has(.fx-login-marca) .fi-simple-main {
-    width: 100%; max-width: 27rem; margin: 0; background: #fff; border-radius: 20px;
-    box-shadow: 0 1px 0 var(--fx-linea), 0 24px 48px -28px rgba(11, 36, 24, .35);
+    width: 100%; max-width: 26rem; margin: 0; padding: 0; background: none; box-shadow: none; border-radius: 0;
     animation: fx-subir .6s var(--fx-salida) .15s both;
 }
 .fi-simple-layout:has(.fx-login-marca) .fi-simple-header .fi-logo { display: none; }
 .fi-simple-header-heading { font-weight: 800; font-size: 1.75rem; }
 
 .fx-login-marca {
+    grid-column: 2; grid-row: 2; border-radius: 28px 0 0 28px;
     position: relative; overflow: hidden; isolation: isolate;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 3rem;
-    min-height: 100dvh; padding: clamp(2rem, 4vw, 3.5rem);
+    display: flex; flex-direction: column; justify-content: space-between; gap: clamp(1rem, 3vh, 2rem);
+    padding: clamp(1.5rem, 4vh, 2.75rem) clamp(1.75rem, 3vw, 2.75rem);
     color: #e9f0e3;
     background: radial-gradient(90% 70% at 100% 100%, rgba(46, 154, 88, .38), transparent 65%),
                 linear-gradient(160deg, var(--fx-bosque-2), var(--fx-bosque) 70%);
+    box-shadow: 0 30px 60px -36px rgba(11, 36, 24, .45);
 }
-.fx-login-logo { height: 2.5rem; width: auto; align-self: flex-start; }
+.fx-login-isotipo {
+    display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 12px; background: #fff;
+    box-shadow: 0 10px 24px -12px rgba(0, 0, 0, .5);
+}
+.fx-login-isotipo img { width: 1.8rem; height: auto; }
+.fx-login-etiqueta { margin-bottom: .75rem; font-size: .8125rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fx-lima); }
 .fx-login-texto { max-width: 30rem; }
 .fx-login-texto h2 {
-    font: 800 clamp(2rem, 3.6vw, 3.25rem)/1.04 var(--fx-titulo); letter-spacing: -.03em;
+    font: 800 clamp(1.75rem, min(2.6vw, 4.6vh), 2.375rem)/1.06 var(--fx-titulo); letter-spacing: -.03em;
     color: #fff; text-wrap: balance;
 }
-.fx-login-texto > p { margin-top: 1.25rem; font-size: 1.125rem; color: #c3d4bf; max-width: 26rem; }
-.fx-login-perfiles { list-style: none; margin: 2.25rem 0 0; padding: 0; }
+.fx-login-texto > p:not(.fx-login-etiqueta) { margin-top: .9rem; font-size: 1rem; line-height: 1.55; color: #c3d4bf; max-width: 26rem; }
+.fx-login-perfiles { list-style: none; margin: clamp(1rem, 3vh, 1.75rem) 0 0; padding: 0; font-size: .9375rem; }
 .fx-login-perfiles li {
-    display: grid; grid-template-columns: 9rem 1fr; gap: 1rem; padding: .85rem 0;
+    display: grid; grid-template-columns: 7.5rem 1fr; gap: 1rem; padding: .6rem 0;
     border-top: 1px solid rgba(233, 240, 227, .14);
 }
 .fx-login-perfiles strong { color: var(--fx-lima); }
 .fx-login-perfiles span { color: #d2dfcd; }
-.fx-login-nota { display: flex; align-items: center; gap: .6rem; font-size: .9375rem; color: #b6c9b2; }
+.fx-login-nota { display: flex; align-items: center; gap: .6rem; font-size: .875rem; color: #b6c9b2; }
 .fx-login-nota svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: var(--fx-lima); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 /* La ciudad de noche asoma abajo a la derecha; screen apaga el negro y la máscara borra los bordes. */
 .fx-login-ciudad {
-    position: absolute; z-index: -1; width: 44rem; height: 44rem; right: -16rem; bottom: -14rem;
-    mix-blend-mode: screen; opacity: .9;
+    position: absolute; z-index: -1; width: 36rem; height: 36rem; right: -15rem; bottom: -13rem;
+    mix-blend-mode: screen; opacity: .8;
     -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
     mask-image: radial-gradient(closest-side, #000 55%, transparent);
 }
@@ -323,4 +349,9 @@ body.fi-body { font-size: 1rem; color: var(--fx-tinta); }
 @media (prefers-reduced-motion: reduce) {
     .fx-acceso-flecha, .fx-enlace-flecha, .fi-sidebar-item-btn > .fi-icon { transition: none; }
     .fi-btn:active { transform: none; }
+}
+
+/* Pantallas bajas (laptop con la barra del navegador): se quitan los perfiles para que todo quepa sin scroll. */
+@media (min-width: 64.01rem) and (max-height: 46rem) {
+    .fx-login-perfiles { display: none; }
 }

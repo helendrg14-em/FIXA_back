@@ -5,53 +5,57 @@
 
 @section('contenido')
 <div class="acceso">
-    @include('cuenta.partes.marca')
+    @include('cuenta.partes.cabecera')
 
-    <main class="acceso-pagina">
-        <div class="acceso-tarjeta">
-            @if ($nueva)
-                <h1>Crea tu contraseña</h1>
-                <p>La usarás para entrar al panel de FIXA con tu correo institucional.</p>
-            @else
-                <h1>Cambia tu contraseña</h1>
-                <p>Desde ahora entrarás al panel con esta contraseña. La anterior dejará de funcionar.</p>
-            @endif
+    <div class="acceso-caja">
+        @include('cuenta.partes.marca', $nueva ? [] : ['etiqueta' => 'Cambiar contraseña', 'titulo' => 'Una contraseña nueva para tu cuenta.', 'texto' => 'Cuando la guardes, la anterior deja de funcionar y entras al panel con la nueva.'])
 
-            <form method="POST" action="{{ route('cuenta.contrasena.guardar', ['usuario' => $usuario]) }}">
-                @csrf
-                <input type="hidden" name="token" value="{{ $token }}">
-
-                <div class="campo">
-                    <label for="password">Contraseña nueva</label>
-                    <div class="campo-control">
-                        <input id="password" name="password" type="password" autocomplete="new-password" required minlength="12"
-                               aria-describedby="password-ayuda" @error('password') aria-invalid="true" @enderror>
-                        @include('cuenta.partes.ver-contrasena', ['campo' => 'password'])
+        <main class="acceso-pagina">
+            <div class="acceso-tarjeta">
+                @if ($nueva)
+                    <h1>Crea tu contraseña</h1>
+                    <p>La usarás para entrar al panel de FIXA con tu correo institucional.</p>
+                @else
+                    <h1>Cambia tu contraseña</h1>
+                    <p>Desde ahora entrarás al panel con esta contraseña. La anterior dejará de funcionar.</p>
+                @endif
+    
+                <form method="POST" action="{{ route('cuenta.contrasena.guardar', ['usuario' => $usuario]) }}">
+                    @csrf
+                    <input type="hidden" name="token" value="{{ $token }}">
+    
+                    <div class="campo">
+                        <label for="password">Contraseña nueva</label>
+                        <div class="campo-control">
+                            <input id="password" name="password" type="password" autocomplete="new-password" required minlength="12"
+                                   aria-describedby="password-ayuda" @error('password') aria-invalid="true" @enderror>
+                            @include('cuenta.partes.ver-contrasena', ['campo' => 'password'])
+                        </div>
+                        <ul class="requisitos" id="password-ayuda" aria-live="polite">
+                            <li data-regla="largo">Al menos 12 caracteres</li>
+                            <li data-regla="letra">Una letra o más</li>
+                            <li data-regla="numero">Un número o más</li>
+                        </ul>
+                        @error('password') <span class="error" role="alert">{{ $message }}</span> @enderror
                     </div>
-                    <ul class="requisitos" id="password-ayuda" aria-live="polite">
-                        <li data-regla="largo">Al menos 12 caracteres</li>
-                        <li data-regla="letra">Una letra o más</li>
-                        <li data-regla="numero">Un número o más</li>
-                    </ul>
-                    @error('password') <span class="error" role="alert">{{ $message }}</span> @enderror
-                </div>
-
-                <div class="campo">
-                    <label for="password_confirmation">Repite la contraseña</label>
-                    <div class="campo-control">
-                        <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required
-                               aria-describedby="confirmacion-ayuda">
-                        @include('cuenta.partes.ver-contrasena', ['campo' => 'password_confirmation'])
+    
+                    <div class="campo">
+                        <label for="password_confirmation">Repite la contraseña</label>
+                        <div class="campo-control">
+                            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required
+                                   aria-describedby="confirmacion-ayuda">
+                            @include('cuenta.partes.ver-contrasena', ['campo' => 'password_confirmation'])
+                        </div>
+                        <ul class="requisitos" id="confirmacion-ayuda" aria-live="polite">
+                            <li data-regla="igual">Las dos contraseñas coinciden</li>
+                        </ul>
                     </div>
-                    <ul class="requisitos" id="confirmacion-ayuda" aria-live="polite">
-                        <li data-regla="igual">Las dos contraseñas coinciden</li>
-                    </ul>
-                </div>
-
-                <button class="boton boton-oscuro" type="submit">Guardar contraseña</button>
-            </form>
-        </div>
-    </main>
+    
+                    <button class="boton boton-oscuro" type="submit">Guardar contraseña</button>
+                </form>
+            </div>
+        </main>
+    </div>
 </div>
 @endsection
 

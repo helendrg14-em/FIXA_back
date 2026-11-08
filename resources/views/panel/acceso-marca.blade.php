@@ -1,8 +1,18 @@
-{{-- Columna de marca del login del panel (render hook SIMPLE_LAYOUT_START). --}}
+{{-- Barra y columna de marca del login del panel (render hook SIMPLE_LAYOUT_START). --}}
+<header class="fx-login-cabecera">
+    <a href="{{ route('portal') }}" class="fx-login-cabecera-logo">
+        <img src="{{ recurso('images/fixa-logo.webp') }}" alt="FIXA, ir al portal" width="144" height="40">
+    </a>
+    <a class="fx-login-portal" href="{{ route('portal') }}">Volver al portal</a>
+</header>
+
 <aside class="fx-login-marca">
-    <img class="fx-login-logo" src="{{ recurso('images/fixa-logo-claro.webp') }}" alt="FIXA" width="144" height="40">
+    <span class="fx-login-isotipo">
+        <img src="{{ recurso('images/fixa-isotipo.webp') }}" alt="" width="40" height="40">
+    </span>
 
     <div class="fx-login-texto">
+        <p class="fx-login-etiqueta">Panel de funcionarios</p>
         <h2>Cada reporte de la ciudad, atendido hasta el cierre.</h2>
         <p>Panel de trabajo para el equipo municipal que recibe, prioriza y resuelve los reportes ciudadanos.</p>
 
