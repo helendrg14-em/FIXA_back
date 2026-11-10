@@ -61,6 +61,20 @@ El administrador crea la cuenta y el sistema envía un enlace de un solo uso, v�
 - Toda tabla nueva debe activar RLS en su migración:
   `DB::statement('ALTER TABLE public.mi_tabla ENABLE ROW LEVEL SECURITY');`
 
+## Base de datos y API en C#
+
+La app Flutter y el panel usan la API en ASP.NET ([Fixa_API](https://github.com/helendrg14-em/Fixa_API)),
+que trabaja sobre esta misma base. **Laravel es el único dueño del esquema**: la API de C# lee y
+escribe datos, pero nunca crea ni cambia tablas.
+
+1. Toda tabla o columna nueva empieza aquí, como migración de Laravel con
+   `ENABLE ROW LEVEL SECURITY`, aunque solo la use la API de C#.
+2. Después se actualiza a mano el modelo de Entity Framework en la API para que coincida.
+   En C# no se usan `dotnet ef migrations` ni `EnsureCreated`.
+3. Se regenera `Fixa.Api.Tests/Datos/schema.sql` en el repositorio de la API, para que sus
+   pruebas corran contra el esquema nuevo (el comando está en su README).
+4. Al desplegar, primero `php artisan migrate` contra Supabase y después la API de C#.
+
 ## Qué ya está hecho
 
 | Medida | Dónde |
