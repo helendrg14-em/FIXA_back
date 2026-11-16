@@ -1,0 +1,42 @@
+# FIXA panel — Integración continua (RNF05)
+# En cada push o pull request a main y develop: auditoría de dependencias y pruebas.
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite, pdo_pgsql, intl, mbstring, zip, gd
+          coverage: none
+
+      - name: Instalar dependencias
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      # RNF06: el build falla si alguna dependencia tiene una vulnerabilidad conocida.
+      - name: Auditoría de dependencias
+        run: composer audit
+
+      - name: Preparar el entorno
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      # Las pruebas usan SQLite en memoria: no necesitan base de datos ni secretos.
+      - name: Pruebas
+        run: php artisan test

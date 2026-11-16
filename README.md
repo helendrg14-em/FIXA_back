@@ -1,4 +1,4 @@
-# FIXA — Panel web y API (Laravel 12 + Filament 5)
+# FIXA — Panel web y portal (Laravel 12 + Filament 5)
 
 Sistema de gestión de incidencias urbanas. Equipo DevCore, Univalle Santa Cruz, 2-2026.
 
@@ -6,7 +6,6 @@ Sistema de gestión de incidencias urbanas. Equipo DevCore, Univalle Santa Cruz,
 
 - PHP 8.4 con `pdo_pgsql`, `pgsql`, `intl`, `mbstring`, `zip`, `gd`, `fileinfo`, `openssl`, `curl`
 - Composer 2
-- Node.js 20+
 - Proyecto en Supabase (PostgreSQL + PostGIS)
 
 ## Puesta en marcha
@@ -46,6 +45,10 @@ Pruebas (usan SQLite en memoria, no tocan Supabase):
 php artisan test
 ```
 
+En GitHub corren solas, junto con `composer audit`, en cada push y pull request a `main` y `develop` (`.github/workflows/ci.yml`, RNF05).
+
+**Si el panel va lento en tu PC**, casi siempre es la distancia a Supabase: cada consulta cruza el continente. Usa la base local de Docker para desarrollar. Si necesitas Supabase, pon `DB_PERSISTENT=true` en tu `.env` para no abrir una conexión nueva en cada petición.
+
 ## Cuentas de funcionarios
 
 El administrador crea la cuenta y el sistema envía un enlace de un solo uso, válido por 48 horas, para que la persona cree su contraseña. Con `MAIL_MAILER=log` el enlace queda en `storage/logs/laravel.log`, que nunca se sube al repositorio.
@@ -54,7 +57,7 @@ El administrador crea la cuenta y el sistema envía un enlace de un solo uso, v�
 
 - **Nunca** subir `.env` ni contraseñas al repositorio. Solo `.env.example`, sin datos reales.
 - `main` está protegida: todo cambio entra por pull request revisado por otro compañero.
-- Ejecutar `composer audit` antes de cada merge (RNF06).
+- `composer audit` corre en cada pull request (RNF06); el merge espera a que pase.
 - Sin registro público: las cuentas las crea solo el administrador.
 - Usuarios y categorías se **desactivan**, nunca se borran (las policies bloquean el borrado).
 - `eventos_historial` es inmutable: un trigger rechaza UPDATE, DELETE y TRUNCATE (RNF08).
