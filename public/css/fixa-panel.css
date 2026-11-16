@@ -355,3 +355,105 @@ body.fi-body { font-size: 1rem; color: var(--fx-tinta); }
 @media (min-width: 64.01rem) and (max-height: 46rem) {
     .fx-login-perfiles { display: none; }
 }
+
+/* ---------- Detalle del caso ---------- */
+/* Franja de datos: etiquetas pequeñas y valores firmes, sin aire de más entre filas. */
+.fx-caso-resumen .fi-in-entry { gap: .125rem; }
+.fx-caso-resumen .fi-in-entry-label { font-size: .8125rem; color: var(--fx-tinta-2); font-weight: 600; }
+.fx-caso-resumen .fi-in-text-item { font-weight: 600; }
+
+/* Reportes e intervenciones: fichas separadas por una línea, no tarjetas dentro de tarjetas. */
+.fx-reportes { display: grid; gap: 0; }
+.fx-reporte { padding: .875rem 0; border-top: 1px solid var(--fx-linea); }
+.fx-reporte:first-child { padding-top: 0; border-top: 0; }
+.fx-reporte:last-child { padding-bottom: 0; }
+.fx-reporte-cabecera { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .625rem; }
+.fx-reporte-codigo { font-weight: 800; color: var(--fx-tinta); font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.fx-reporte-meta { color: var(--fx-tinta-2); font-size: .875rem; }
+.fx-reporte-texto { margin-top: .375rem; color: var(--fx-tinta); line-height: 1.5; max-width: 72ch; }
+.fx-reporte-datos { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; margin-top: .5rem; font-size: .875rem; }
+.fx-reporte-datos div { display: flex; gap: .375rem; }
+.fx-reporte-datos dt { color: var(--fx-tinta-2); }
+.fx-reporte-datos dd { color: var(--fx-tinta); font-weight: 600; }
+
+.fx-chip {
+    display: inline-flex; align-items: center; padding: .0625rem .5rem; border-radius: 999px;
+    font-size: .75rem; font-weight: 700; color: #17643a; background: #edf5e8;
+}
+.fx-chip-aviso { color: #9a4208; background: var(--fx-naranja-suave); }
+.fx-chip-ok { color: #17643a; background: #dcebd3; }
+.fx-chip-error { color: #b42318; background: #fdecea; }
+
+.fx-fotos { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .625rem; }
+.fx-foto {
+    display: block; width: 6.5rem; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden;
+    background: var(--fx-papel-2); outline-offset: 2px; transition: transform .2s var(--fx-salida), box-shadow .2s ease;
+}
+.fx-foto img { width: 100%; height: 100%; object-fit: cover; }
+.fx-foto:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -14px rgba(11, 36, 24, .6); }
+
+/* Historial: línea de tiempo con un punto por evento. */
+.fx-historial { position: relative; display: grid; gap: .875rem; padding-left: 1.125rem; }
+.fx-historial::before {
+    content: ''; position: absolute; left: .25rem; top: .375rem; bottom: .375rem; width: 2px;
+    background: var(--fx-linea); border-radius: 2px;
+}
+.fx-historial-item { position: relative; }
+.fx-historial-item::before {
+    content: ''; position: absolute; left: -1.0625rem; top: .3125rem; width: .5625rem; height: .5625rem;
+    border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--fx-hoja-viva);
+}
+.fx-historial-item:first-child::before { background: var(--fx-hoja-viva); }
+.fx-historial-fecha { display: block; font-size: .75rem; font-weight: 700; color: var(--fx-tinta-2); font-variant-numeric: tabular-nums; }
+.fx-historial-detalle { font-size: .875rem; line-height: 1.45; color: var(--fx-tinta); }
+.fx-historial-motivo { margin-top: .25rem; font-size: .8125rem; color: var(--fx-tinta-2); font-style: italic; }
+.fx-vacio { color: var(--fx-tinta-2); font-size: .875rem; }
+
+/* Secciones compactas del panel: encabezado más bajo. */
+.fi-section.fi-compact .fi-section-header-heading { font-size: 1rem; }
+
+/* ---------- Calendario de feriados ---------- */
+.fx-cal { background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px var(--fx-linea); padding: 1rem 1.25rem 1.125rem; }
+.fx-cal-cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .875rem; }
+.fx-cal-titulo { font-family: var(--fx-titulo); font-weight: 800; font-size: 1.375rem; letter-spacing: -.02em; color: var(--fx-tinta); }
+.fx-cal-ayuda { font-size: .875rem; color: var(--fx-tinta-2); }
+.fx-cal-nav { display: flex; gap: .375rem; }
+.fx-cal-boton {
+    display: inline-flex; align-items: center; justify-content: center; min-width: 2.75rem; min-height: 2.75rem;
+    padding: 0 .75rem; border-radius: 12px; background: #fff; color: #17643a; font-weight: 700;
+    box-shadow: inset 0 0 0 1.5px var(--fx-linea); transition: background-color .15s ease, box-shadow .15s ease;
+}
+.fx-cal-boton:hover { background: #edf5e8; box-shadow: inset 0 0 0 1.5px var(--fx-hoja-viva); }
+.fx-cal-icono { width: 1.25rem; height: 1.25rem; }
+
+.fx-cal-rejilla { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .375rem; transition: opacity .15s ease; }
+.fx-cal-cargando { opacity: .55; }
+.fx-cal-dia-semana { padding-bottom: .25rem; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--fx-tinta-2); text-align: center; }
+.fx-cal-dia {
+    position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: .25rem;
+    min-height: 4.25rem; padding: .5rem .5rem .4375rem; border-radius: 12px; text-align: left;
+    background: var(--fx-papel); color: var(--fx-tinta); transition: background-color .15s ease, box-shadow .15s ease, transform .15s var(--fx-salida);
+}
+button.fx-cal-dia { cursor: pointer; }
+button.fx-cal-dia:hover { background: #edf5e8; box-shadow: inset 0 0 0 1.5px var(--fx-hoja-viva); }
+button.fx-cal-dia:active { transform: scale(.98); }
+.fx-cal-numero { font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+.fx-cal-mas { position: absolute; right: .5rem; bottom: .375rem; font-weight: 700; color: var(--fx-hoja); opacity: 0; transition: opacity .15s ease; }
+button.fx-cal-dia:hover .fx-cal-mas, button.fx-cal-dia:focus-visible .fx-cal-mas { opacity: 1; }
+.fx-cal-finde { background: var(--fx-papel-2); color: var(--fx-tinta-2); }
+.fx-cal-fuera { background: transparent; color: #a3b09f; }
+.fx-cal-es-hoy { box-shadow: inset 0 0 0 2px var(--fx-hoja); }
+.fx-cal-es-hoy .fx-cal-numero { color: var(--fx-hoja); }
+.fx-cal-feriado { background: var(--fx-bosque); color: #fff; }
+.fx-cal-feriado .fx-cal-numero { color: var(--fx-lima); }
+button.fx-cal-feriado:hover { background: var(--fx-bosque-2); box-shadow: inset 0 0 0 1.5px var(--fx-lima); }
+.fx-cal-nombre {
+    font-size: .75rem; font-weight: 600; line-height: 1.25; color: #e3eedb;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.fx-cal-leyenda { display: flex; flex-wrap: wrap; gap: .375rem 1.25rem; margin-top: .875rem; font-size: .8125rem; color: var(--fx-tinta-2); }
+.fx-cal-leyenda li { display: inline-flex; align-items: center; gap: .4375rem; }
+.fx-cal-muestra { width: .875rem; height: .875rem; border-radius: 4px; }
+.fx-cal-muestra-feriado { background: var(--fx-bosque); }
+.fx-cal-muestra-finde { background: var(--fx-papel-2); box-shadow: inset 0 0 0 1px var(--fx-linea); }
+.fx-cal-muestra-hoy { box-shadow: inset 0 0 0 2px var(--fx-hoja); }

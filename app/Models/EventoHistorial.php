@@ -11,4 +11,9 @@ class EventoHistorial extends Model
     public $timestamps = false;
 
     protected $fillable = ['caso_id', 'usuario_id', 'tipo', 'estado_anterior', 'estado_nuevo', 'detalle', 'motivo'];
+
+    protected function casts(): array
+    {
+        return ['fecha_hora' => 'datetime'];
+    }
 }

@@ -34,7 +34,7 @@ class FeriadoResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            DatePicker::make('fecha')->required()->native(false)->displayFormat('d/m/Y')
+            DatePicker::make('fecha')->required()->native(false)->displayFormat('d/m/Y')->closeOnDateSelection()
                 ->unique(ignoreRecord: true)
                 ->validationMessages(['unique' => 'Esta fecha ya está registrada.']),
             TextInput::make('nombre')->required()->maxLength(100),
@@ -55,8 +55,9 @@ class FeriadoResource extends Resource
                 TextColumn::make('fuente')->wrap(),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                // Después de editar o borrar, el calendario de arriba se vuelve a dibujar.
+                EditAction::make()->modalHeading('Editar feriado')->after(fn ($livewire) => $livewire->dispatch('feriados-actualizados')),
+                DeleteAction::make()->after(fn ($livewire) => $livewire->dispatch('feriados-actualizados')),
             ]);
     }
 

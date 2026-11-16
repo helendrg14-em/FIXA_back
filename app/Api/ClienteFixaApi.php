@@ -5,6 +5,7 @@ namespace App\Api;
 use App\Auth\ServicioAutenticacion;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
@@ -15,6 +16,9 @@ use Illuminate\Support\Facades\Http;
  */
 class ClienteFixaApi
 {
+    // Los mensajes al funcionario no nombran la API ni el servidor: eso queda en el log.
+    private const TARDANDO = 'El sistema está tardando en responder.';
+
     // ---------------------------------------------------------------- Casos
 
     public function pasarARevision(int $casoId): void
@@ -97,9 +101,21 @@ class ClienteFixaApi
     public function tipos(string $categoria): array
     {
         try {
-            $respuesta = $this->http(conToken: false)->get(rtrim($this->base(), '/').'/api/v1/publico/categorias/'.rawurlencode($categoria).'/tipos');
-        } catch (ConnectionException) {
-            throw new ErrorApi('No se pudo conectar con la API de FIXA. Intenta de nuevo en un minuto.');
+            // Es solo lectura: si la API está despertando (Render gratis) o devuelve un 5xx
+            // pasajero, se reintenta antes de molestar al funcionario.
+            $respuesta = $this->http(conToken: false)
+                ->retry(3, 2000, fn (\Throwable $e): bool => $e instanceof ConnectionException
+                    || ($e instanceof RequestException && $e->response->serverError()), throw: false)
+                ->get(rtrim($this->base(), '/').'/api/v1/publico/categorias/'.rawurlencode($categoria).'/tipos');
+        } catch (ConnectionException $e) {
+            report($e);
+
+            throw new ErrorApi(self::TARDANDO.' Vuelve a elegir la categoría en unos segundos.');
+        }
+        if ($respuesta->serverError()) {
+            report(new ErrorApi("Tipos de {$categoria}: la API respondió {$respuesta->status()}.", $respuesta->status()));
+
+            throw new ErrorApi(self::TARDANDO.' Vuelve a elegir la categoría en unos segundos.', $respuesta->status());
         }
         if ($respuesta->failed()) {
             throw $this->traducir($respuesta);
@@ -115,8 +131,10 @@ class ClienteFixaApi
     {
         try {
             $respuesta = $pedido($this->http());
-        } catch (ConnectionException) {
-            throw new ErrorApi('No se pudo conectar con la API de FIXA. Si estuvo inactiva, tarda hasta un minuto en despertar: intenta de nuevo.');
+        } catch (ConnectionException $e) {
+            report($e);
+
+            throw new ErrorApi(self::TARDANDO.' Espera un minuto e intenta de nuevo.');
         }
 
         if ($respuesta->failed()) {
@@ -148,16 +166,20 @@ class ClienteFixaApi
     private function traducir(Response $respuesta): ErrorApi
     {
         $estado = $respuesta->status();
+        // El detalle técnico va al log, para quienes mantienen el sistema; el funcionario no lo ve.
+        if ($estado === 401 || $estado >= 500) {
+            report(new \RuntimeException("La API respondió {$estado} en {$respuesta->effectiveUri()?->getPath()}."));
+        }
 
         return match (true) {
-            $estado === 401 => new ErrorApi('La API no aceptó tu sesión. Vuelve a ingresar al panel.', 401),
+            $estado === 401 => new ErrorApi('Tu sesión venció. Vuelve a ingresar al panel.', 401),
             $estado === 403 => new ErrorApi('Tu perfil no puede hacer esta acción.', 403),
             $estado === 404 => new ErrorApi($respuesta->json('title') ?: 'El caso no existe o no te corresponde.', 404),
             $estado === 429 => new ErrorApi('Demasiados intentos seguidos. Espera un minuto.', 429),
             is_array($respuesta->json('errors')) && $respuesta->json('errors') !== [] => new ErrorApi(
                 collect($respuesta->json('errors'))->flatten()->implode(' '), $estado),
             is_string($respuesta->json('title')) && $estado < 500 => new ErrorApi($respuesta->json('title'), $estado),
-            default => new ErrorApi('La API de FIXA tuvo un problema. Intenta de nuevo.', $estado),
+            default => new ErrorApi('No se pudo completar la acción. Intenta de nuevo en un momento.', $estado),
         };
     }
 }

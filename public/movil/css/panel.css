@@ -41,3 +41,13 @@
     .fx-fila-meta { width: 100%; text-align: start; padding-left: 3.4rem; }
     .fx-datos dd { font-size: 1.625rem; }
 }
+
+/* Calendario de feriados y detalle del caso en celular */
+@media (max-width: 40rem) {
+    .fx-cal { padding: .875rem .75rem 1rem; }
+    .fx-cal-rejilla { gap: .25rem; }
+    .fx-cal-dia { min-height: 3rem; padding: .375rem; border-radius: 9px; align-items: center; }
+    .fx-cal-nombre, .fx-cal-mas { display: none; }
+    .fx-cal-dia-semana { font-size: .6875rem; letter-spacing: .02em; }
+    .fx-foto { width: 5.5rem; }
+}

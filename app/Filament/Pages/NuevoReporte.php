@@ -66,45 +66,50 @@ class NuevoReporte extends Page
 
     public function form(Schema $schema): Schema
     {
-        return $schema->statePath('data')->columns(2)->components([
-            Section::make('¿Qué problema es?')->columnSpan(1)->schema([
-                Radio::make('canal')->label('¿Cómo llegó el reclamo?')->required()->inline()
-                    ->options([CanalOrigen::Telefono->value => 'Por teléfono', CanalOrigen::Presencial->value => 'En ventanilla']),
-                Select::make('categoria')->label('Categoría')->required()->native(false)->live()
-                    ->options(fn (): array => Categoria::query()->where('activa', true)->orderBy('id')->pluck('nombre', 'codigo')->all())
-                    ->afterStateUpdated(fn (Set $set) => $set('tipo', null)),
-                Select::make('tipo')->label('Tipo')->required()->native(false)
-                    ->options(fn (Get $get): array => $get('categoria') ? $this->tipos($get('categoria')) : [])
-                    ->disabled(fn (Get $get): bool => blank($get('categoria')))
-                    ->live(),
-                TextInput::make('numero_luminarias')->label('Número de luminarias')->numeric()->minValue(1)->maxValue(200)
-                    ->visible(fn (Get $get): bool => $get('categoria') === 'alumbrado' && $get('tipo') !== 'otro')
-                    ->required(fn (Get $get): bool => $get('categoria') === 'alumbrado' && $get('tipo') !== 'otro'),
-                TextInput::make('codigo_aviso_cobranza')->label('Código del aviso de cobranza (opcional)')->maxLength(30)
-                    ->visible(fn (Get $get): bool => $get('categoria') === 'alumbrado'),
-                Textarea::make('descripcion')->label('Descripción')->required()->maxLength(1000)->rows(4)
-                    ->placeholder('Lo que cuenta el vecino: qué pasa y desde cuándo.'),
-                TextInput::make('correo')->label('Correo del vecino (opcional)')->email()->maxLength(120)
-                    ->helperText('Para avisarle cuando cambie el estado. No se publica.'),
-            ]),
-            Section::make('¿Dónde está?')->columnSpan(1)->schema([
-                ViewField::make('mapa')->hiddenLabel()->view('panel.mapa-punto')->dehydrated(false),
-                Grid::make(2)->schema([
-                    TextInput::make('latitud')->required()->numeric()->minValue(-90)->maxValue(90)->live(debounce: 600),
-                    TextInput::make('longitud')->required()->numeric()->minValue(-180)->maxValue(180)->live(debounce: 600),
+        // Dos columnas: el reclamo (lo que cuenta el vecino) y el lugar. En celular se apilan.
+        return $schema->statePath('data')->columns(['default' => 1, 'lg' => 5])->components([
+            Section::make('Reclamo')->compact()->icon(Heroicon::OutlinedChatBubbleBottomCenterText)
+                ->columnSpan(['default' => 1, 'lg' => 3])->columns(['default' => 1, 'sm' => 2])
+                ->schema([
+                    Radio::make('canal')->label('¿Cómo llegó?')->required()->inline()->columnSpanFull()
+                        ->options([CanalOrigen::Telefono->value => 'Por teléfono', CanalOrigen::Presencial->value => 'En ventanilla']),
+                    Select::make('categoria')->label('Categoría')->placeholder('Elige la categoría')->required()->native(false)->live()
+                        ->options(fn (): array => Categoria::query()->where('activa', true)->orderBy('id')->pluck('nombre', 'codigo')->all())
+                        ->afterStateUpdated(fn (Set $set) => $set('tipo', null)),
+                    Select::make('tipo')->label('Tipo')->required()->native(false)->live()
+                        ->placeholder(fn (Get $get): string => blank($get('categoria')) ? 'Elige antes la categoría' : 'Elige el tipo')
+                        ->options(fn (Get $get): array => $get('categoria') ? $this->tipos($get('categoria')) : [])
+                        ->disabled(fn (Get $get): bool => blank($get('categoria'))),
+                    TextInput::make('numero_luminarias')->label('Luminarias afectadas')->numeric()->minValue(1)->maxValue(200)
+                        ->visible(fn (Get $get): bool => $get('categoria') === 'alumbrado' && $get('tipo') !== 'otro')
+                        ->required(fn (Get $get): bool => $get('categoria') === 'alumbrado' && $get('tipo') !== 'otro'),
+                    TextInput::make('codigo_aviso_cobranza')->label('Código del aviso de cobranza')->maxLength(30)->hint('Opcional')
+                        ->visible(fn (Get $get): bool => $get('categoria') === 'alumbrado'),
+                    Textarea::make('descripcion')->label('Descripción')->required()->maxLength(1000)->rows(3)->autosize()->columnSpanFull()
+                        ->placeholder('Lo que cuenta el vecino: qué pasa y desde cuándo.'),
+                    TextInput::make('correo')->label('Correo del vecino')->email()->maxLength(120)->columnSpanFull()
+                        ->hint('Opcional')->placeholder('nombre@correo.com')
+                        ->helperText('Para avisarle cuando cambie el estado. Si no tiene correo, deja el campo vacío.'),
+                    FileUpload::make('fotos')->label('Fotos')->hint('Opcional, hasta 3')->columnSpanFull()
+                        ->multiple()->maxFiles(3)->image()->panelLayout('grid')->imagePreviewHeight('96')
+                        ->acceptedFileTypes(['image/jpeg', 'image/webp'])->maxSize(3072)->storeFiles(false)->live()
+                        ->helperText('JPG o WebP de hasta 3 MB, por ejemplo la que el vecino mandó por WhatsApp.'),
+                    TextInput::make('motivo_sin_foto')->label('¿Por qué no hay foto?')->maxLength(200)->minLength(5)->columnSpanFull()
+                        ->placeholder('Ej.: el vecino llamó y no tiene cámara.')
+                        ->visible(fn (Get $get): bool => blank($get('fotos')))
+                        ->required(fn (Get $get): bool => blank($get('fotos'))),
                 ]),
-                TextInput::make('direccion')->label('Dirección (opcional)')->maxLength(200),
-                TextInput::make('referencia')->label('Referencia (opcional)')->maxLength(200)->placeholder('Ej.: frente al mercado'),
-            ]),
-            Section::make('Foto')->columnSpanFull()->schema([
-                FileUpload::make('fotos')->label('Fotos (opcional, hasta 3)')->multiple()->maxFiles(3)->image()
-                    ->acceptedFileTypes(['image/jpeg', 'image/webp'])->maxSize(3072)->storeFiles(false)->live()
-                    ->helperText('JPG o WebP de hasta 3 MB, por ejemplo la que el vecino mandó por WhatsApp.'),
-                TextInput::make('motivo_sin_foto')->label('¿Por qué no hay foto?')->maxLength(200)->minLength(5)
-                    ->placeholder('Ej.: el vecino llamó y no tiene cámara.')
-                    ->visible(fn (Get $get): bool => blank($get('fotos')))
-                    ->required(fn (Get $get): bool => blank($get('fotos'))),
-            ]),
+            Section::make('Lugar')->compact()->icon(Heroicon::OutlinedMapPin)
+                ->columnSpan(['default' => 1, 'lg' => 2])
+                ->schema([
+                    ViewField::make('mapa')->hiddenLabel()->view('panel.mapa-punto')->dehydrated(false),
+                    Grid::make(2)->schema([
+                        TextInput::make('latitud')->required()->numeric()->minValue(-90)->maxValue(90)->live(debounce: 600),
+                        TextInput::make('longitud')->required()->numeric()->minValue(-180)->maxValue(180)->live(debounce: 600),
+                    ]),
+                    TextInput::make('direccion')->label('Dirección')->hint('Opcional')->maxLength(200),
+                    TextInput::make('referencia')->label('Referencia')->hint('Opcional')->maxLength(200)->placeholder('Ej.: frente al mercado'),
+                ]),
         ]);
     }
 
