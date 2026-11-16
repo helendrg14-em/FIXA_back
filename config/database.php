@@ -98,6 +98,9 @@ return [
             // PostGIS vive en el esquema "extensions" (convención de Supabase).
             'search_path' => env('DB_SEARCH_PATH', 'public,extensions'),
             'sslmode' => env('DB_SSLMODE', 'require'),
+            // Solo para desarrollar contra Supabase desde lejos: abrir la conexión tarda 1,5 s y
+            // así se reutiliza entre peticiones. En Render no hace falta (misma región).
+            'options' => env('DB_PERSISTENT', false) ? [PDO::ATTR_PERSISTENT => true] : [],
         ],
 
         'sqlsrv' => [

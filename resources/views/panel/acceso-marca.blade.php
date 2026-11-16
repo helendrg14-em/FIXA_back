@@ -30,3 +30,8 @@
 
     <x-fixa.ciudad class="fx-login-ciudad" />
 </aside>
+
+{{-- La API en Render gratis se duerme: se la despierta mientras el funcionario escribe su clave. --}}
+<script>
+    fetch(@js(rtrim((string) config('services.fixa_api.url'), '/').'/salud'), { mode: 'no-cors', cache: 'no-store' }).catch(() => {});
+</script>
