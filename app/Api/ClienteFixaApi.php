@@ -5,6 +5,7 @@ namespace App\Api;
 use App\Auth\ServicioAutenticacion;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
@@ -97,9 +98,19 @@ class ClienteFixaApi
     public function tipos(string $categoria): array
     {
         try {
-            $respuesta = $this->http(conToken: false)->get(rtrim($this->base(), '/').'/api/v1/publico/categorias/'.rawurlencode($categoria).'/tipos');
+            // Es solo lectura: si la API está despertando (Render gratis) o devuelve un 5xx
+            // pasajero, se reintenta antes de molestar al funcionario.
+            $respuesta = $this->http(conToken: false)
+                ->retry(3, 2000, fn (\Throwable $e): bool => $e instanceof ConnectionException
+                    || ($e instanceof RequestException && $e->response->serverError()), throw: false)
+                ->get(rtrim($this->base(), '/').'/api/v1/publico/categorias/'.rawurlencode($categoria).'/tipos');
         } catch (ConnectionException) {
-            throw new ErrorApi('No se pudo conectar con la API de FIXA. Intenta de nuevo en un minuto.');
+            throw new ErrorApi('La API de FIXA está despertando. Vuelve a elegir la categoría en unos segundos.');
+        }
+        if ($respuesta->serverError()) {
+            report(new ErrorApi("Tipos de {$categoria}: la API respondió {$respuesta->status()}.", $respuesta->status()));
+
+            throw new ErrorApi('La API de FIXA está despertando. Vuelve a elegir la categoría en unos segundos.', $respuesta->status());
         }
         if ($respuesta->failed()) {
             throw $this->traducir($respuesta);

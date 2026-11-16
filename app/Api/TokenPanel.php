@@ -4,7 +4,6 @@ namespace App\Api;
 
 use App\Models\User;
 use Illuminate\Support\Str;
-use RuntimeException;
 
 /**
  * Token JWT (HS256) con el que el panel habla con la API en nombre del funcionario.
@@ -22,7 +21,9 @@ final class TokenPanel
     {
         $clave = (string) config('services.fixa_api.jwt_clave');
         if (strlen($clave) < 32) {
-            throw new RuntimeException('Falta configurar FIXA_API_JWT_CLAVE (la misma clave Jwt__Clave de la API).');
+            report(new \RuntimeException('Falta configurar FIXA_API_JWT_CLAVE.'));
+
+            throw new ErrorApi('El panel no está conectado a la API: falta configurar FIXA_API_JWT_CLAVE. Avisa al administrador del sistema.');
         }
 
         $ahora ??= time();
