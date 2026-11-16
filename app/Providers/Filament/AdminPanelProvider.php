@@ -3,11 +3,11 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\Login;
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\FontProviders\LocalFontProvider;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Tables\Table;
@@ -63,8 +63,12 @@ class AdminPanelProvider extends PanelProvider
             // Estilos de escritorio y, aparte, los de tablet y celular (public/movil).
             ->renderHook(PanelsRenderHook::STYLES_AFTER, fn (): HtmlString => new HtmlString('<link rel="stylesheet" href="'.e(recurso('css/fixa-panel.css')).'">'
                 .'<link rel="stylesheet" href="'.e(recurso('movil/css/panel.css')).'">'))
+            // Leaflet para el mapa de «Nuevo reporte» (resources/views/panel/mapa-punto.blade.php).
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): HtmlString => new HtmlString(
+                '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">'
+                .'<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>'))
             // Columna de marca junto al formulario de acceso.
-            ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START,fn (): string => view('panel.acceso-marca')->render(), scopes: Login::class)
+            ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START, fn (): string => view('panel.acceso-marca')->render(), scopes: Login::class)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             // Pages/Inicio.php reemplaza al Dashboard por defecto; cada perfil ve su resumen en Widgets/{Admin,Supervisor,Tecnico}.
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
