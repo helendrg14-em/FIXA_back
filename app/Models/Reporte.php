@@ -42,4 +42,15 @@ class Reporte extends Model
     {
         return $this->hasMany(FotoReporte::class, 'reporte_id');
     }
+
+    public function distrito(): BelongsTo
+    {
+        return $this->belongsTo(Distrito::class, 'distrito_id');
+    }
+
+    /** Funcionario que lo registró por teléfono o en ventanilla; vacío si vino de la app. */
+    public function operador(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'operador_id');
+    }
 }

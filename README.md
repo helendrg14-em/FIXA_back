@@ -75,6 +75,19 @@ escribe datos, pero nunca crea ni cambia tablas.
    pruebas corran contra el esquema nuevo (el comando está en su README).
 4. Al desplegar, primero `php artisan migrate` contra Supabase y después la API de C#.
 
+**Cómo se reparten el trabajo el panel y la API:** el panel *lee* directo de la base (bandeja,
+detalle, revisiones), pero todo lo que *cambia* un caso o crea un reporte va por la API
+(`app/Api/ClienteFixaApi.php`). Así la máquina de estados, el historial, los plazos y los avisos
+al vecino viven en un solo lugar. El panel firma un token de 15 minutos para cada funcionario
+(`app/Api/TokenPanel.php`) con la misma clave que la API (`FIXA_API_JWT_CLAVE` = `Jwt__Clave`),
+y la API vuelve a comprobar en cada pedido que la cuenta siga activa.
+
+| Pantalla del panel | Quién la ve | Qué hace por la API |
+|---|---|---|
+| Casos | Supervisor (su unidad) y administrador (todas) | Revisión, prioridad, programar, aprobar y cerrar, rechazar el trabajo, corregir categoría, duplicado, derivar, rechazar |
+| Nuevo reporte | Administrador | Registro por teléfono o en ventanilla, con foto o con el motivo de por qué no hay |
+| Revisiones | Supervisor (su unidad) y administrador (todas) | Reabrir el caso o explicar al vecino por qué no |
+
 ## Qué ya está hecho
 
 | Medida | Dónde |
@@ -103,6 +116,7 @@ La imagen se construye con el `Dockerfile` y corre panel y portal en un solo con
    - `APP_URL`: `https://tu-app.onrender.com`
    - `DB_CONNECTION=pgsql`, `DB_HOST`, `DB_PORT=5432`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `DB_SSLMODE=require`
    - `MAILGUN_DOMAIN`, `MAILGUN_SECRET`, `MAIL_FROM_ADDRESS`
+   - `FIXA_API_URL` (la dirección de la API en Render) y `FIXA_API_JWT_CLAVE` (el mismo valor que `Jwt__Clave` de la API)
 3. Usa `/up` como Health Check Path.
 4. Las migraciones se ejecutan desde una PC apuntando a Supabase. El contenedor nunca las corre al arrancar.
 

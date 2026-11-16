@@ -66,6 +66,7 @@ trait EsquemaDePrueba
             $t->foreignId('unidad_id')->nullable();
             $t->string('estado');
             $t->string('prioridad')->nullable();
+            $t->text('justificacion_prioridad')->nullable();
             $t->boolean('requiere_verificacion_campo')->default(false);
             $t->boolean('vencido')->default(false);
             $t->timestamp('fecha_creacion')->useCurrent();
@@ -132,6 +133,28 @@ trait EsquemaDePrueba
             $t->text('trabajo_realizado');
             $t->string('estado_validacion');
             $t->text('observacion_validacion')->nullable();
+        });
+        Schema::create('evidencias', function (Blueprint $t) {
+            $t->id();
+            $t->foreignId('intervencion_id');
+            $t->string('tipo');
+            $t->string('url')->nullable();
+            $t->string('descripcion')->nullable();
+        });
+        Schema::create('entidades_externas', function (Blueprint $t) {
+            $t->id();
+            $t->string('nombre');
+            $t->string('contacto')->nullable();
+        });
+        Schema::create('solicitudes_revision', function (Blueprint $t) {
+            $t->id();
+            $t->foreignId('reporte_id');
+            $t->foreignId('supervisor_id')->nullable();
+            $t->timestamp('fecha_solicitud')->useCurrent();
+            $t->text('motivo');
+            $t->string('estado')->default('pendiente');
+            $t->text('respuesta')->nullable();
+            $t->timestamp('fecha_resolucion')->nullable();
         });
 
         // Sustitutos de PostGIS: el punto se guarda como texto para poder comprobarlo.
