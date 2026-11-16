@@ -43,8 +43,8 @@
     }"
     x-init="iniciar()"
 >
-    <div x-ref="mapa" style="height: 340px; border-radius: 12px; border: 1px solid #d5ddd0; z-index: 0;"></div>
-    <p style="margin-top: .5rem; font-size: .875rem; color: #4a5d48;">
+    <div x-ref="mapa" style="height: clamp(220px, 32vh, 300px); border-radius: 12px; border: 1px solid #dbe3d5; z-index: 0;"></div>
+    <p style="margin-top: .375rem; font-size: .8125rem; color: #4f614d;">
         Toca el mapa o arrastra el pin hasta el lugar exacto del problema.
     </p>
 </div>
