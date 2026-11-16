@@ -5,11 +5,14 @@ namespace App\Filament\Resources\Categorias\RelationManagers;
 use App\Enums\Prioridad;
 use App\Models\MetaAtencion;
 use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +42,10 @@ class MetasAtencionRelationManager extends RelationManager
             Select::make('medida')->label('Se cuenta en')->required()->native(false)->live()
                 ->options(['plazo_horas' => 'Horas corridas', 'plazo_dias_habiles' => 'Días hábiles'])
                 ->helperText('Los días hábiles no cuentan sábados, domingos ni feriados.'),
+            DatePicker::make('vigente_desde')->label('Desde')->required()->default(today())->native(false)
+                ->helperText('Fecha de inicio del plazo.'),
+            DatePicker::make('vigente_hasta')->label('Hasta')->native(false)
+                ->helperText('Dejar en blanco si el plazo sigue vigente.'),
         ]);
     }
 
@@ -54,7 +61,36 @@ class MetasAtencionRelationManager extends RelationManager
                 TextColumn::make('plazo')->label('Plazo')
                     ->state(fn (MetaAtencion $record): string => $record->plazoLegible()),
                 TextColumn::make('vigente_desde')->label('Desde')->date('d/m/Y'),
-                TextColumn::make('vigente_hasta')->label('Hasta')->date('d/m/Y')->placeholder('Vigente'),
+                TextColumn::make('vigente_hasta')->label('Hasta')->date('d/m/Y')->placeholder('—'),
+                TextColumn::make('estado')->label('Estado')
+                    ->state(fn (MetaAtencion $record): string => $record->vigente_hasta === null ? 'Vigente' : 'Histórico')
+                    ->badge()
+                    ->color(fn (string $state): string => $state === 'Vigente' ? 'success' : 'gray'),
+            ])
+            ->recordActions([
+                EditAction::make()
+                    ->label('Editar')
+                    ->modalHeading('Editar plazo de atención')
+                    ->mutateRecordDataUsing(function (array $data, MetaAtencion $record): array {
+                        // Hidrata el campo virtual "medida" a partir de qué columna tiene valor.
+                        $data['medida']  = $record->plazo_horas !== null ? 'plazo_horas' : 'plazo_dias_habiles';
+                        $data['plazo']   = $record->plazo_horas ?? $record->plazo_dias_habiles;
+                        return $data;
+                    })
+                    ->using(function (MetaAtencion $record, array $data): MetaAtencion {
+                        $medida  = $data['medida'];
+                        $opuesta = $medida === 'plazo_horas' ? 'plazo_dias_habiles' : 'plazo_horas';
+
+                        $record->update([
+                            'prioridad'    => $data['prioridad'],
+                            $medida        => $data['plazo'],
+                            $opuesta       => null,
+                            'vigente_desde' => $data['vigente_desde'],
+                            'vigente_hasta' => $data['vigente_hasta'] ?? null,
+                        ]);
+
+                        return $record;
+                    }),
             ])
             ->headerActions([
                 CreateAction::make()->label('Definir plazo')->modalHeading('Definir plazo de atención')->createAnother(false)
@@ -67,9 +103,10 @@ class MetasAtencionRelationManager extends RelationManager
                                 ->update(['vigente_hasta' => today()]);
 
                             return $categoria->metasAtencion()->create([
-                                'prioridad' => $prioridad,
+                                'prioridad'    => $prioridad,
                                 $data['medida'] => $data['plazo'],
-                                'vigente_desde' => today(),
+                                'vigente_desde' => $data['vigente_desde'] ?? today(),
+                                'vigente_hasta' => $data['vigente_hasta'] ?? null,
                             ]);
                         });
                     }),
