@@ -23,7 +23,7 @@ final class TokenPanel
         if (strlen($clave) < 32) {
             report(new \RuntimeException('Falta configurar FIXA_API_JWT_CLAVE.'));
 
-            throw new ErrorApi('El panel no está conectado a la API: falta configurar FIXA_API_JWT_CLAVE. Avisa al administrador del sistema.');
+            throw new ErrorApi('No se pudo completar la acción. Avisa al equipo de soporte de FIXA.');
         }
 
         $ahora ??= time();
