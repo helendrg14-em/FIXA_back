@@ -21,6 +21,14 @@ return [
         'scheme' => 'https',
     ],
 
+    // API en C# (Fixa_API). El panel firma el token de cada funcionario con la misma clave
+    // que usa la API (Jwt__Clave en Render), así no se pide la contraseña dos veces.
+    'fixa_api' => [
+        'url' => env('FIXA_API_URL', 'https://fixa-api-nhua.onrender.com'),
+        'jwt_clave' => env('FIXA_API_JWT_CLAVE'),
+        'espera' => (int) env('FIXA_API_ESPERA', 90), // Render gratis tarda en despertar
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],
