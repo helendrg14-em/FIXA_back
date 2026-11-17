@@ -146,7 +146,9 @@ class RecuperarPasswordTest extends TestCase
                 $callback($correo);
             }
 
-            $this->assertSame('no', $correo->getHeaders()->get('o:tracking-clicks')?->getBodyAsString());
+            foreach (['X-Mailgun-Track', 'X-Mailgun-Track-Clicks', 'o:tracking-clicks'] as $cabecera) {
+                $this->assertSame('no', $correo->getHeaders()->get($cabecera)?->getBodyAsString(), $cabecera);
+            }
         }
     }
 }
