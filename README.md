@@ -2,44 +2,102 @@
 
 Sistema de gestión de incidencias urbanas. Equipo DevCore, Univalle Santa Cruz, 2-2026.
 
-## Requisitos
+## Cómo encajan los tres proyectos
 
-- PHP 8.4 con `pdo_pgsql`, `pgsql`, `intl`, `mbstring`, `zip`, `gd`, `fileinfo`, `openssl`, `curl`
-- Composer 2
-- Proyecto en Supabase (PostgreSQL + PostGIS)
+| Repositorio | Qué es | Puerto en tu PC |
+|---|---|---|
+| **FIXA_back** (este) | Panel de funcionarios y portal. Dueño de la base de datos (migraciones) | 8000 |
+| [Fixa_API](https://github.com/helendrg14-em/Fixa_API) | API en ASP.NET con las reglas de negocio | 5112 |
+| [FIXA_app](https://github.com/helendrg14-em/FIXA_app) | App Android del vecino | — |
 
-## Puesta en marcha
+Para desarrollar, **cada uno usa su propia base en Docker**, no la de Supabase: es más rápida
+y no arriesga los datos reales. Orden para levantar todo: **1)** base y Laravel (este README),
+**2)** la API, **3)** la app.
+
+## 1. Qué instalar (una sola vez, en Windows)
+
+| Programa | Para qué | Cómo comprobarlo |
+|---|---|---|
+| [Git](https://git-scm.com) | Clonar y subir cambios | `git --version` |
+| PHP **8.4.27 o superior** | Correr Laravel | `php -v` |
+| [Composer 2](https://getcomposer.org) | Dependencias de PHP | `composer --version` |
+| [Docker Desktop](https://www.docker.com/products/docker-desktop) | La base de datos local (PostgreSQL + PostGIS) | `docker --version` |
+
+PHP en Windows: `winget install PHP.PHP.NTS.8.4`. Después, en el `php.ini` (lo muestra
+`php --ini`), quita el `;` de estas líneas: `extension=curl`, `fileinfo`, `gd`, `intl`,
+`mbstring`, `openssl`, `pdo_pgsql`, `pgsql`, `pdo_sqlite`, `sqlite3` y `zip`.
+Comprueba con `php -m` que aparecen.
+
+No hace falta Node.js: el panel no usa Vite.
+
+## 2. Poner en marcha
 
 ```bash
+git clone https://github.com/helendrg14-em/FIXA_back.git
+cd FIXA_back
+git checkout develop
 composer install
 cp .env.example .env
 php artisan key:generate
 ```
 
-En `.env`, completa `DB_HOST`, `DB_USERNAME` y `DB_PASSWORD` con los datos de Supabase
-(Project Settings > Database > Session pooler) y los `ADMIN_*` del primer administrador.
+En tu `.env`, cambia la base a la local de Docker y pon **tus propios** datos de administrador:
 
-```bash
-php artisan migrate
-php artisan db:seed     # administrador, 3 unidades y 3 categorías
-php artisan serve
+```
+DB_HOST=127.0.0.1
+DB_PORT=5433
+DB_DATABASE=fixa
+DB_USERNAME=fixa
+DB_PASSWORD=una_contraseña_solo_para_tu_pc
+DB_SSLMODE=disable
+
+ADMIN_NOMBRES=Tu nombre
+ADMIN_APELLIDOS=Tu apellido
+ADMIN_EMAIL=tu_correo@gmail.com
+ADMIN_PASSWORD=una_contraseña_de_12_o_más
 ```
 
-Portal: http://localhost:8000
-Panel: http://localhost:8000/admin
-
-Base local para desarrollar (opcional, requiere Docker Desktop). En `.env` usa
-`DB_HOST=127.0.0.1`, `DB_PORT=5433`, `DB_SSLMODE=disable` y un `DB_DATABASE`, `DB_USERNAME`
-y `DB_PASSWORD` solo para esta base. Guarda antes los datos de Supabase en `.env.supabase`,
-que Git ignora.
+Con Docker Desktop abierto:
 
 ```bash
 docker compose up -d --wait
 php artisan migrate
-php artisan db:seed
+php artisan db:seed     # tu administrador, unidades, categorías, cuadrillas y distritos
+php artisan serve
 ```
 
-Pruebas (usan SQLite en memoria, no tocan Supabase):
+- Portal: http://localhost:8000
+- Panel: http://localhost:8000/admin, con el correo y la contraseña de `ADMIN_*`.
+
+Para crear supervisores o técnicos, usa el panel. Con `MAIL_MAILER=log` no se envía ningún
+correo: el enlace para crear la contraseña queda en `storage/logs/laravel.log`.
+
+## 3. Conectar el panel con la API de tu PC
+
+Las acciones sobre los casos (pasar a revisión, prioridad, programar, nuevo reporte) van por la
+API. Para usarlas en local, levanta la API (ver su README) y agrega a tu `.env`:
+
+```
+FIXA_API_URL=http://localhost:5112
+FIXA_API_JWT_CLAVE=la_misma_clave_que_Jwt:Clave_de_tu_API
+```
+
+Las dos claves **deben ser idénticas** y tener al menos 32 caracteres: el panel firma con ella
+el token de cada funcionario y la API lo verifica. Sin la API, el resto del panel funciona igual.
+
+## Problemas comunes
+
+| Síntoma | Causa | Solución |
+|---|---|---|
+| `could not find driver` | Falta `pdo_pgsql` en `php.ini` | Activa la extensión y revisa `php -m` |
+| `Connection refused` al migrar | Docker no está encendido | Abre Docker Desktop y repite `docker compose up -d --wait` |
+| El panel va muy lento | Tu `.env` apunta a Supabase | Usa la base de Docker |
+| "No se pudo completar la acción" en un caso | La API no está levantada o la clave no coincide | Revisa el paso 3; el detalle está en `storage/logs/laravel.log` |
+| `docker compose` pide `DB_DATABASE` | Falta en el `.env` | Completa los datos `DB_*` del paso 2 |
+
+## Pruebas
+
+Usan SQLite en memoria; no necesitan Docker ni tocan ninguna base:
 
 ```bash
 php artisan test
