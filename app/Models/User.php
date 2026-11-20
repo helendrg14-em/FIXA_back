@@ -28,12 +28,6 @@ class User extends Authenticatable implements FilamentUser, HasName
 
     const UPDATED_AT = null;
 
-    /**
-     * Solo el administrador edita cuentas (ver UserPolicy). No exponer este modelo
-     * a rutas publicas ni a la API del ciudadano.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'tipo',
         'activo',
@@ -107,10 +101,6 @@ class User extends Authenticatable implements FilamentUser, HasName
         return $this->correo;
     }
 
-    /**
-     * Filament lo revisa en el login y en cada peticion al panel, asi que una cuenta
-     * desactivada pierde el acceso aunque tenga una sesion abierta.
-     */
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->activo && $this->tipo?->puedeEntrarAlPanel();
@@ -134,19 +124,11 @@ class User extends Authenticatable implements FilamentUser, HasName
         $this->notify(new RegistrarPassword($this->nuevoToken(now()->addHours(48))));
     }
 
-    /**
-     * Contraseña olvidada: enlace de un solo uso que vence en 60 minutos. La contraseña
-     * actual sigue sirviendo hasta que se cree la nueva.
-     */
     public function enviarEnlaceRecuperacion(): void
     {
         $this->notify(new RecuperarPassword($this->nuevoToken(now()->addMinutes(60))));
     }
 
-    /**
-     * El enlace se arma con APP_URL y no con el host de la petición: así nadie puede
-     * pedir una recuperación con una cabecera Host falsa y recibir un enlace a su sitio.
-     */
     public function enlaceContrasena(string $token): string
     {
         return rtrim((string) config('app.url'), '/')

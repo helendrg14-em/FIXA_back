@@ -32,12 +32,6 @@ use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
-/**
- * Registro asistido (R07, requerimientos v1.2): el administrador carga el reclamo de un vecino
- * que llamó o fue a ventanilla. Se envía a la API, que aplica las mismas reglas que la app
- * (distrito, unidad, código y clave) y guarda quién lo registró. La clave se muestra una vez
- * para dictársela al vecino.
- */
 class NuevoReporte extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPlusCircle;

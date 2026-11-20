@@ -22,10 +22,6 @@ use Livewire\Livewire;
 use Tests\Concerns\EsquemaDePrueba;
 use Tests\TestCase;
 
-/**
- * Bandeja de casos, nuevo reporte y revisiones del panel. Las acciones van a la API de C#,
- * que aquí se simula con Http::fake: se comprueba qué se le envía y con qué token.
- */
 class PanelCasosTest extends TestCase
 {
     use EsquemaDePrueba;

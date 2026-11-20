@@ -5,10 +5,6 @@ namespace App\Policies;
 use App\Models\MetaAtencion;
 use App\Models\User;
 
-/**
- * R03: el administrador configura los plazos. Una meta no se edita ni se borra:
- * se reemplaza por otra para conservar el historial de plazos.
- */
 class MetaAtencionPolicy
 {
     public function viewAny(User $user): bool

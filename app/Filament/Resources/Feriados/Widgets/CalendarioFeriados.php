@@ -7,11 +7,6 @@ use Filament\Widgets\Widget;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\On;
 
-/**
- * Calendario del mes con los feriados marcados (RN-06). Tocar un día libre abre «Agregar
- * feriado» con esa fecha; tocar un feriado abre su edición. Los fines de semana se ven
- * apagados porque ya no cuentan como días hábiles.
- */
 class CalendarioFeriados extends Widget
 {
     protected string $view = 'panel.feriados.calendario';

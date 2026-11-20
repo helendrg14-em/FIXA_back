@@ -5,10 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Entidades a las que se derivan los casos que no son de competencia municipal.
- * Son las mismas que muestra el portal publico. Se puede ejecutar varias veces.
- */
 class EntidadesExternasSeeder extends Seeder
 {
     public function run(): void

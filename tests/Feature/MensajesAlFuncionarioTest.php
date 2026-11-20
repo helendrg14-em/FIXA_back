@@ -10,10 +10,6 @@ use Illuminate\Support\Facades\Http;
 use Tests\Concerns\EsquemaDePrueba;
 use Tests\TestCase;
 
-/**
- * El funcionario no sabe qué es una API: los avisos del panel hablan del «sistema» y el detalle
- * técnico queda en el log, para quienes lo mantienen.
- */
 class MensajesAlFuncionarioTest extends TestCase
 {
     use EsquemaDePrueba;

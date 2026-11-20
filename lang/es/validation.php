@@ -1,11 +1,6 @@
 <?php
 
-/*
- * Mensajes de validación en español. Laravel solo trae inglés: sin este archivo, el panel
- * mostraba "validation.required" o el texto en inglés.
- */
 return [
-
     'accepted' => 'Debes aceptar :attribute.',
     'accepted_if' => 'Debes aceptar :attribute cuando :other es :value.',
     'active_url' => ':Attribute no es una dirección web válida.',

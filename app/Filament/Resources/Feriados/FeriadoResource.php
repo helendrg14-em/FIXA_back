@@ -15,10 +15,6 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-/**
- * RN-06: fechas que no cuentan como día hábil. Cambiar una no recalcula los casos que ya
- * tienen fecha objetivo.
- */
 class FeriadoResource extends Resource
 {
     protected static ?string $model = Feriado::class;

@@ -14,11 +14,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-/**
- * Un reporte tiene datos comunes, datos de su categoría y datos que dependen del
- * canal. Se arma paso a paso y registrar() recién valida el conjunto y lo guarda de una
- * sola vez (RNF: guardado atómico e idempotente).
- */
 class ReporteBuilder
 {
     private const ALFABETO_CLAVE = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';

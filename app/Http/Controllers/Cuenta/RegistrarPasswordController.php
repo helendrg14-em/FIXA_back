@@ -8,11 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
-/**
- * El funcionario crea su contraseña con el enlace que recibe por correo, al recibir su
- * cuenta o al recuperar una contraseña olvidada. Cualquier enlace
- * invalido da la misma respuesta, para no revelar si una cuenta existe.
- */
 class RegistrarPasswordController extends Controller
 {
     public function show(Request $request, int $usuario): View

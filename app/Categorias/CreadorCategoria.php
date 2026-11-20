@@ -5,11 +5,6 @@ namespace App\Categorias;
 use App\Enums\CodigoCategoria;
 use Illuminate\Validation\Rule;
 
-/**
- * Factory Method: el formulario común (ubicación, tipo y descripción) vive aquí, y cada
- * subclase decide con crearDefinicion() qué categoría se usa. Una categoría nueva solo
- * agrega su creador y su definición; este código no cambia.
- */
 abstract class CreadorCategoria
 {
     public const TIPO_OTRO = 'otro';

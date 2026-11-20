@@ -36,11 +36,6 @@ enum EstadoCaso: string implements HasLabel
         };
     }
 
-    /**
-     * Estados en los que el caso ya no lo atiende FIXA.
-     *
-     * @return list<string>
-     */
     public static function finales(): array
     {
         return [self::Cerrada->value, self::Rechazada->value, self::Duplicada->value, self::Derivada->value];

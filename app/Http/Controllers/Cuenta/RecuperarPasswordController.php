@@ -12,10 +12,6 @@ use Throwable;
 
 use function Illuminate\Support\defer;
 
-/**
- * "¿Olvidaste tu contraseña?". La respuesta es siempre la misma y el correo sale después
- * de responder, para que ni el mensaje ni la demora revelen si una cuenta existe.
- */
 class RecuperarPasswordController extends Controller
 {
     public function create(): View

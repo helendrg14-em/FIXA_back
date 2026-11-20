@@ -67,10 +67,6 @@ class Caso extends Model
         return $this->intervenciones()->where('estado_validacion', 'pendiente')->latest('fecha')->first();
     }
 
-    /**
-     * Casos que puede ver el usuario: el administrador, todos; el supervisor, los de su unidad;
-     * cualquier otro perfil, ninguno. Es la misma regla que aplica la API al cambiarlos.
-     */
     public function scopeVisiblesPara(Builder $consulta, ?User $usuario): Builder
     {
         return match (true) {

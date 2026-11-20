@@ -5,22 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Los 15 distritos municipales de Santa Cruz de la Sierra (12 urbanos y 3 rurales) con
- * su numero y nombre. Los LIMITES SON APROXIMADOS, para la demo: cada distrito es un
- * sector de anillo alrededor de la plaza 24 de Septiembre, ubicado en la zona que le
- * corresponde segun la descripcion de las subalcaldias:
- *
- *  - Centro hasta ~2do anillo: D11 (Central).
- *  - Del 2do al 4to anillo: D1 oeste, D2 noreste, D3 este y D4 sur.
- *  - Del 4to anillo hacia afuera: D5, D6, D7, D8, D9, D12 y D10, girando desde el norte.
- *  - Rurales mas lejos: D15 al norte, D13 al este y D14 al sureste.
- *
- * Los sectores comparten exactamente sus bordes, asi que no hay superposiciones. Al
- * oeste del 4to anillo no hay distrito rural porque el rio Pirai es el limite municipal.
- * Reemplazar por los poligonos oficiales del GAMSC cuando el equipo los tenga.
- * Se puede ejecutar varias veces: actualiza los distritos que ya existen.
- */
 class DistritosSeeder extends Seeder
 {
     // Plaza 24 de Septiembre (longitud, latitud).
@@ -52,12 +36,6 @@ class DistritosSeeder extends Seeder
         }
     }
 
-    /**
-     * Numero => [nombre, anillo de coordenadas]. Los rumbos se miden en grados desde el
-     * norte, en sentido horario (90 = este, 180 = sur, 270 = oeste).
-     *
-     * @return array<int, array{string, list<array{float, float}>}>
-     */
     public function distritos(): array
     {
         $central = self::RADIO_CENTRAL;
@@ -101,11 +79,6 @@ class DistritosSeeder extends Seeder
         return $distritos;
     }
 
-    /**
-     * Puntos de un arco de circunferencia entre dos rumbos, ambos incluidos.
-     *
-     * @return list<array{float, float}>
-     */
     private function arco(float $radio, float $desde, float $hasta): array
     {
         [$lng, $lat] = self::CENTRO;
@@ -122,12 +95,6 @@ class DistritosSeeder extends Seeder
         return $puntos;
     }
 
-    /**
-     * Quita un punto final repetido y vuelve a cerrar el anillo con el primero, como exige GeoJSON.
-     *
-     * @param  list<array{float, float}>  $puntos
-     * @return list<array{float, float}>
-     */
     private function cerrar(array $puntos): array
     {
         if (end($puntos) == $puntos[0]) {

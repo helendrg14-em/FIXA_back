@@ -6,10 +6,6 @@ use App\Models\Cuadrilla;
 use App\Models\UnidadResponsable;
 use Illuminate\Database\Seeder;
 
-/**
- * Cuadrillas de demostracion: dos por unidad, una por turno. Necesita CatalogosSeeder
- * antes, porque cada cuadrilla pertenece a una unidad. Se puede ejecutar varias veces.
- */
 class CuadrillasSeeder extends Seeder
 {
     public function run(): void

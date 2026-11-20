@@ -13,10 +13,6 @@ class DefinicionAlumbrado implements DefinicionCategoria
         ];
     }
 
-    /**
-     * El supervisor usa el número de luminarias para fijar la prioridad. Si la falla no es
-     * de luminarias, el vecino elige "Otro" y la explica en la descripción.
-     */
     public function reglasPropias(): array
     {
         return [

@@ -17,11 +17,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
 
-/**
- * R03 / RN-06: plazos de atención por prioridad. Un plazo nuevo cierra el vigente de esa
- * prioridad en lugar de editarlo, para conservar el historial. La medida elegida es la
- * columna que se llena: plazo_horas o plazo_dias_habiles.
- */
 class MetasAtencionRelationManager extends RelationManager
 {
     protected static string $relationship = 'metasAtencion';

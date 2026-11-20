@@ -10,10 +10,6 @@ use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * Pestañas por etapa en lugar de un filtro de estado: el supervisor ve de un vistazo qué le
- * toca hacer y cuántos casos hay en cada etapa, sin abrir el panel de filtros.
- */
 class ListCasos extends ListRecords
 {
     protected static string $resource = CasoResource::class;

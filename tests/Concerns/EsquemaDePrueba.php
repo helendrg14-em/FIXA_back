@@ -8,10 +8,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * Las migraciones reales usan PostGIS y RLS, que SQLite no tiene. Las pruebas crean solo
- * las tablas que necesitan y nunca tocan la base de Supabase.
- */
 trait EsquemaDePrueba
 {
     protected function crearEsquema(): void

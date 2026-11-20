@@ -10,11 +10,6 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
-/**
- * Las acciones que cambian un caso pasan por la API de C#: ahí están la máquina de estados,
- * el historial, los plazos y los avisos al vecino. El panel solo lee directo de la base
- * (listas y detalle) y nunca escribe casos por su cuenta, así las reglas viven en un solo lugar.
- */
 class ClienteFixaApi
 {
     // Los mensajes al funcionario no nombran la API ni el servidor: eso queda en el log.
@@ -75,13 +70,6 @@ class ClienteFixaApi
 
     // ---------------------------------------------------------------- Reportes
 
-    /**
-     * Registro asistido por teléfono o en ventanilla (solo administrador).
-     *
-     * @param  array<string, scalar|null>  $datos
-     * @param  list<string>  $fotos  rutas de archivos ya comprimidos (WebP o JPEG)
-     * @return array{codigo: string, clave: ?string}
-     */
     public function registrarReporte(array $datos, array $fotos): array
     {
         $respuesta = $this->enviar(function (PendingRequest $h) use ($datos, $fotos) {
@@ -96,11 +84,6 @@ class ClienteFixaApi
         return ['codigo' => (string) $respuesta->json('codigo'), 'clave' => $respuesta->json('clave')];
     }
 
-    /**
-     * Tipos de incidencia de una categoría (ruta pública de la API, no necesita token).
-     *
-     * @return array<string, string> valor => texto
-     */
     public function tipos(string $categoria): array
     {
         try {

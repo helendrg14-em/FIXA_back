@@ -5,14 +5,6 @@ namespace App\Api;
 use App\Models\User;
 use Illuminate\Support\Str;
 
-/**
- * Token JWT (HS256) con el que el panel habla con la API en nombre del funcionario.
- *
- * Lleva los mismos datos que entrega POST /api/v1/panel/auth/login de la API (sub, rol y
- * nombre) y vence a los 15 minutos, igual que la sesión (RNF-06). La API vuelve a comprobar
- * en cada pedido que la cuenta siga activa, así que desactivar a alguien corta su acceso
- * al instante también aquí.
- */
 final class TokenPanel
 {
     public const DURACION_SEGUNDOS = 15 * 60;

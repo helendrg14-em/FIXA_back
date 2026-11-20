@@ -26,10 +26,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Bandeja de casos (RF-05 a RF-12). El supervisor ve los de su unidad y el administrador todos.
- * La lista y el detalle se leen de la base; los cambios se hacen con AccionesCaso, por la API.
- */
 class CasoResource extends Resource
 {
     protected static ?string $model = Caso::class;

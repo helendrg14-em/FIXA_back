@@ -8,10 +8,6 @@ use App\Models\Feriado;
 use App\Models\UnidadResponsable;
 use Illuminate\Database\Seeder;
 
-/**
- * Las 3 unidades y las 3 categorias de la version 1 (RN-01). Se puede ejecutar varias
- * veces: no duplica filas ni cambia lo que el administrador ya haya editado.
- */
 class CatalogosSeeder extends Seeder
 {
     public function run(): void
@@ -47,10 +43,6 @@ class CatalogosSeeder extends Seeder
         $this->crearFeriados();
     }
 
-    /**
-     * Metas internas iniciales acordadas por el equipo; cada unidad las ajusta en el panel.
-     * Referencia: alumbrado de La Paz, 5 días hábiles y 24 horas si es urgente (lapaz.bo).
-     */
     private function crearPlazosIniciales(): void
     {
         $plazos = [
@@ -70,10 +62,6 @@ class CatalogosSeeder extends Seeder
         }
     }
 
-    /**
-     * Solo fechas de 2026 aún por venir. Los traslados de 2027 dependen de un decreto que
-     * no está publicado; el administrador los agrega en el panel cuando salga.
-     */
     private function crearFeriados(): void
     {
         $fuente = 'Calendario 2026 según DS 5521 (Ministerio de Turismo Sostenible y Culturas)';

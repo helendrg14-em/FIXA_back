@@ -18,10 +18,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * Solicitudes de revisión del cierre (RF-18): el vecino no quedó conforme. Aceptar reabre el
- * caso (vuelve a Asignada); no aceptar exige explicarle por qué. Se responde por la API.
- */
 class RevisionResource extends Resource
 {
     protected static ?string $model = SolicitudRevision::class;

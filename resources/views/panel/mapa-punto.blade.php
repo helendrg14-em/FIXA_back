@@ -1,9 +1,3 @@
-{{--
-    Mapa para marcar el lugar del problema. Mueve el mapa o toca un punto: la latitud y la
-    longitud del formulario se actualizan solas. Usa OpenStreetMap, igual que la app.
-    Leaflet se carga en la cabecera del panel (AdminPanelProvider), porque el panel navega sin
-    recargar y un <script> dentro de la página no siempre se ejecuta a tiempo.
---}}
 
 <div
     wire:ignore

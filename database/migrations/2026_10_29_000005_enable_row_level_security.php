@@ -5,13 +5,6 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    /**
-     * Supabase publica una API REST sobre el esquema public. Con RLS activo y sin
-     * politicas, los roles anon y authenticated no pueden leer ni escribir nada;
-     * Laravel entra como dueno de las tablas y no se ve afectado.
-     *
-     * Toda tabla nueva debe activar RLS en su propia migracion.
-     */
     public function up(): void
     {
         DB::unprepared(<<<'SQL'

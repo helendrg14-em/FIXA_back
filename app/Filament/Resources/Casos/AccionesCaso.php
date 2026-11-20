@@ -18,13 +18,6 @@ use Filament\Notifications\Notification;
 use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
 
-/**
- * Acciones sobre un caso (RF-05, RF-06, RF-08, RF-10, RF-12). Cada una llama a la API, que
- * valida la transición (RN-03), guarda el historial y avisa al vecino. Los botones solo se
- * muestran en los estados donde la API acepta la acción; si igual falla, se muestra su mensaje.
- *
- * Las ve el supervisor (casos de su unidad) y el administrador (todos).
- */
 final class AccionesCaso
 {
     /** @return list<Action> */

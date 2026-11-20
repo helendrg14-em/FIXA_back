@@ -13,11 +13,6 @@ use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 
-/**
- * Mapa de la ciudad con los casos reportados, como el que ve el vecino en la app, pero con el
- * enlace a cada caso. El administrador ve toda la ciudad y el supervisor, solo su unidad.
- * Lee la ubicación del primer reporte de cada caso; los apoyos están en el mismo lugar.
- */
 class Mapa extends Page
 {
     private const MAXIMO = 2000;

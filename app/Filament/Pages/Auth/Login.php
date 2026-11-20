@@ -11,11 +11,6 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use SensitiveParameter;
 
-/**
- * Login de funcionarios con correo y contraseña. Sin "Recordarme", porque la
- * sesion debe expirar a los 15 minutos de inactividad. Filament ya limita a 5 intentos
- * por minuto y rechaza las cuentas donde canAccessPanel() devuelve false.
- */
 class Login extends BaseLogin
 {
     public function getHeading(): string|Htmlable
@@ -32,10 +27,6 @@ class Login extends BaseLogin
             ]);
     }
 
-    /**
-     * Filament solo ofrece su propio "¿Olvidaste tu contraseña?", que pide la tabla de
-     * Laravel. Aquí lleva a la recuperación de FIXA, que usa el mismo enlace por correo.
-     */
     protected function getPasswordFormComponent(): Component
     {
         return parent::getPasswordFormComponent()

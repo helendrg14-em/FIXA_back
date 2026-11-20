@@ -27,10 +27,6 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Gate;
 use Throwable;
 
-/**
- * R03: cuentas de funcionarios. Se crean sin contraseña conocida (la registra el funcionario
- * con un enlace) y se desactivan, nunca se borran.
- */
 class UsuarioResource extends Resource
 {
     protected static ?string $model = User::class;
@@ -156,12 +152,6 @@ class UsuarioResource extends Resource
         ];
     }
 
-    /**
-     * Quita los datos de otros perfiles para que no queden al cambiar el perfil de una cuenta.
-     *
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
     public static function limpiarPorPerfil(array $data, TipoUsuario|string|null $tipo): array
     {
         if (! self::tipoEs($tipo, TipoUsuario::Supervisor)) {
