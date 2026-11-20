@@ -64,6 +64,8 @@ body.fi-body { font-size: 1rem; color: var(--fx-tinta); }
     content: ''; position: absolute; inset-inline-end: .75rem; width: .4rem; height: .4rem;
     border-radius: 50%; background: var(--fx-lima);
 }
+/* Si el ítem tiene contador (por ejemplo, Casos), el contador ocupa ese lugar y el punto se oculta. */
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn:has(.fi-sidebar-item-badge-ctn)::after { display: none; }
 .fi-sidebar-item-grouped-border-part { background-color: rgba(233, 238, 229, .2); }
 .fi-sidebar .fi-icon-btn .fi-icon { color: #dfe8d8; }
 

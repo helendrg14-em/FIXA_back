@@ -12,3 +12,6 @@ CHANGELOG.md export-ignore
 
 # Se ejecuta en Linux: no debe tener CRLF.
 docker/start.sh text eol=lf
+
+# Librería de terceros con huella SRI (integrity): se guarda byte por byte, sin convertir saltos de línea.
+public/js/leaflet/** -text
