@@ -161,6 +161,9 @@ trait EsquemaDePrueba
         $pdo = DB::connection()->getPdo();
         $pdo->sqliteCreateFunction('ST_MakePoint', fn ($lng, $lat) => "POINT($lng $lat)", 2);
         $pdo->sqliteCreateFunction('ST_SetSRID', fn ($punto, $srid) => "SRID=$srid;$punto", 2);
+        $coordenada = fn (?string $punto, int $i): ?float => preg_match('/POINT\(([-\d.]+) ([-\d.]+)\)/', (string) $punto, $m) ? (float) $m[$i] : null;
+        $pdo->sqliteCreateFunction('ST_X', fn ($punto) => $coordenada($punto, 1), 1);
+        $pdo->sqliteCreateFunction('ST_Y', fn ($punto) => $coordenada($punto, 2), 1);
         Schema::create('usuarios', function (Blueprint $t) {
             $t->id();
             $t->string('tipo');

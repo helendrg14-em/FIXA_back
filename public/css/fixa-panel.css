@@ -457,3 +457,16 @@ button.fx-cal-feriado:hover { background: var(--fx-bosque-2); box-shadow: inset 
 .fx-cal-muestra-feriado { background: var(--fx-bosque); }
 .fx-cal-muestra-finde { background: var(--fx-papel-2); box-shadow: inset 0 0 0 1px var(--fx-linea); }
 .fx-cal-muestra-hoy { box-shadow: inset 0 0 0 2px var(--fx-hoja); }
+
+/* ---- Mapa de reportes (resources/views/panel/mapa-ciudad.blade.php) ---- */
+.fx-mapa-filtros { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.fx-mapa-filtros > .fi-input-wrp { min-width: 14rem; }
+.fx-mapa-leyenda { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin: 0; padding: 0; list-style: none; font-size: .875rem; }
+.fx-mapa-leyenda li { display: flex; align-items: center; gap: .375rem; }
+.fx-mapa-leyenda span { width: .875rem; height: .875rem; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #b3c0ae; }
+.fx-mapa-total { margin: 0 0 .5rem; font-size: .875rem; color: #4f614d; }
+.fx-mapa-ciudad { height: max(420px, calc(100vh - 290px)); border-radius: 12px; border: 1px solid #dbe3d5; z-index: 0; }
+@media (max-width: 640px) {
+    .fx-mapa-filtros > .fi-input-wrp { min-width: 100%; }
+    .fx-mapa-ciudad { height: 60vh; }
+}
