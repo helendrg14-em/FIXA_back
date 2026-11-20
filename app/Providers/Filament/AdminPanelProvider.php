@@ -63,10 +63,12 @@ class AdminPanelProvider extends PanelProvider
             // Estilos de escritorio y, aparte, los de tablet y celular (public/movil).
             ->renderHook(PanelsRenderHook::STYLES_AFTER, fn (): HtmlString => new HtmlString('<link rel="stylesheet" href="'.e(recurso('css/fixa-panel.css')).'">'
                 .'<link rel="stylesheet" href="'.e(recurso('movil/css/panel.css')).'">'))
-            // Leaflet para el mapa de «Nuevo reporte» (resources/views/panel/mapa-punto.blade.php).
+            // Leaflet 1.9.4 para los mapas de «Nuevo reporte» y «Mapa». Se sirve desde public/js/leaflet
+            // y no desde unpkg: no depende de otro sitio y Apache lo guarda en caché un año.
+            // Va en la cabecera y no en cada página porque el panel navega sin recargar.
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): HtmlString => new HtmlString(
-                '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">'
-                .'<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>'))
+                '<link rel="stylesheet" href="'.e(recurso('js/leaflet/leaflet.css')).'" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=">'
+                .'<script src="'.e(recurso('js/leaflet/leaflet.js')).'" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="></script>'))
             // Columna de marca junto al formulario de acceso.
             ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START, fn (): string => view('panel.acceso-marca')->render(), scopes: Login::class)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
