@@ -1,4 +1,4 @@
-{{-- Mapa de reportes de la ciudad (App\Filament\Pages\Mapa). Un círculo por caso, del color de su categoría. --}}
+{{-- Mapa de reportes de la ciudad (App\Filament\Pages\Mapa). Un pin por caso, del color de su categoría. --}}
 @php
     $colores = ['bache' => '#d0600b', 'alumbrado' => '#c99a06', 'residuos' => '#1f7d47'];
 @endphp
@@ -50,17 +50,32 @@
                 this.capa.clearLayers();
                 this.total = puntos.length;
                 for (const p of puntos) {
-                    L.circleMarker([p.lat, p.lng], {
-                        radius: p.vencido ? 11 : 9,
-                        color: p.vencido ? '#b42318' : '#ffffff',
-                        weight: p.vencido ? 3 : 2,
-                        fillColor: this.colores[p.codigo] ?? '#677a64',
-                        fillOpacity: p.cerrado ? 0.45 : 0.9,
-                    }).bindPopup(() => this.ficha(p)).addTo(this.capa);
+                    L.marker([p.lat, p.lng], { icon: this.pin(p), riseOnHover: true })
+                        .bindPopup(() => this.ficha(p))
+                        .addTo(this.capa);
                 }
                 if (puntos.length) {
                     this.mapa.fitBounds(puntos.map((p) => [p.lat, p.lng]), { padding: [40, 40], maxZoom: 16 });
                 }
+            },
+            // Pin en forma de gota, del color de la categoría. Los vencidos van más grandes y con borde rojo;
+            // los cerrados, atenuados. El color sale de la lista fija de arriba, nunca de la base.
+            pin(p) {
+                const ancho = p.vencido ? 34 : 28;
+                const alto = Math.round(ancho * 4 / 3);
+                const color = this.colores[p.codigo] ?? '#677a64';
+                const borde = p.vencido ? '#b42318' : '#ffffff';
+                const grosor = p.vencido ? 2 : 1.5;
+                const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 28 36' width='${ancho}' height='${alto}'>`
+                    + `<path d='M12 0C5.4 0 0 5.3 0 11.9 0 20.8 12 32 12 32s12-11.2 12-20.1C24 5.3 18.6 0 12 0z' fill='${color}' stroke='${borde}' stroke-width='${grosor}'/>`
+                    + `<circle cx='12' cy='11.9' r='4.6' fill='#ffffff'/></svg>`;
+                return L.divIcon({
+                    html: svg,
+                    className: 'fx-pin' + (p.cerrado ? ' fx-pin-cerrado' : ''),
+                    iconSize: [ancho, alto],
+                    iconAnchor: [ancho / 2, alto - 1],
+                    popupAnchor: [0, -alto + 4],
+                });
             },
             // Se arma con nodos y textContent, no con HTML, para no interpretar lo que venga de la base.
             ficha(p) {

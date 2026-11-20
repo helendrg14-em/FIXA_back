@@ -468,6 +468,9 @@ button.fx-cal-feriado:hover { background: var(--fx-bosque-2); box-shadow: inset 
 .fx-mapa-leyenda span { width: .875rem; height: .875rem; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #b3c0ae; }
 .fx-mapa-total { margin: 0 0 .5rem; font-size: .875rem; color: #4f614d; }
 .fx-mapa-ciudad { height: max(420px, calc(100vh - 290px)); border-radius: 12px; border: 1px solid #dbe3d5; z-index: 0; }
+.fx-pin { background: none; border: 0; }
+.fx-pin svg { display: block; overflow: visible; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .35)); }
+.fx-pin-cerrado { opacity: .5; }
 @media (max-width: 640px) {
     .fx-mapa-filtros > .fi-input-wrp { min-width: 100%; }
     .fx-mapa-ciudad { height: 60vh; }
