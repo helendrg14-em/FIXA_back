@@ -3,6 +3,7 @@
 namespace App\Api;
 
 use App\Auth\ServicioAutenticacion;
+use App\Enums\Prioridad;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
@@ -31,9 +32,11 @@ class ClienteFixaApi
         $this->enviar(fn (PendingRequest $h) => $h->patch("casos/{$casoId}/estado", ['estado' => 'rechazada', 'motivo' => $motivo]));
     }
 
-    public function clasificarPrioridad(int $casoId, string $prioridad, string $justificacion): void
+    /** Filament entrega la prioridad como enum (el select usa Prioridad::class); la API espera su valor. */
+    public function clasificarPrioridad(int $casoId, Prioridad|string $prioridad, string $justificacion): void
     {
-        $this->enviar(fn (PendingRequest $h) => $h->patch("casos/{$casoId}/prioridad", ['prioridad' => $prioridad, 'justificacion' => $justificacion]));
+        $valor = $prioridad instanceof Prioridad ? $prioridad->value : $prioridad;
+        $this->enviar(fn (PendingRequest $h) => $h->patch("casos/{$casoId}/prioridad", ['prioridad' => $valor, 'justificacion' => $justificacion]));
     }
 
     public function programar(int $casoId, int $cuadrillaId, string $fecha, ?string $motivoReprogramacion = null): void

@@ -125,6 +125,23 @@ class PanelCasosTest extends TestCase
             && str_starts_with($r->header('Authorization')[0] ?? '', 'Bearer '));
     }
 
+    public function test_asignar_prioridad_envia_la_prioridad_y_la_justificacion_a_la_api(): void
+    {
+        Http::fake([self::API.'/*' => Http::response(null, 204)]);
+        $this->casoAlumbrado->forceFill(['estado' => 'en_revision'])->save();
+        $this->actingAs($this->usuario());
+
+        Livewire::test(ViewCaso::class, ['record' => $this->casoAlumbrado->getRouteKey()])
+            ->callAction('prioridad', data: ['prioridad' => 'media', 'justificacion' => 'Afecta a muchas personas.'])
+            ->assertHasNoFormErrors()
+            ->assertNotified('Prioridad guardada.');
+
+        Http::assertSent(fn (Request $r): bool => $r->method() === 'PATCH'
+            && $r->url() === self::API."/api/v1/panel/casos/{$this->casoAlumbrado->id}/prioridad"
+            && $r['prioridad'] === 'media'
+            && $r['justificacion'] === 'Afecta a muchas personas.');
+    }
+
     public function test_si_la_api_rechaza_la_accion_se_muestra_su_mensaje(): void
     {
         Http::fake([self::API.'/*' => Http::response(['title' => 'La fecha prevista no puede ser anterior a hoy.'], 422)]);
