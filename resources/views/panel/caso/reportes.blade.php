@@ -4,8 +4,8 @@
 @endphp
 
 <ol class="fx-reportes">
-    @foreach ($reportes as $reporte)
-        <li class="fx-reporte">
+    @forelse ($reportes as $reporte)
+        <li class="fx-reporte" id="reporte-{{ $reporte->id }}">
             <div class="fx-reporte-cabecera">
                 <span class="fx-reporte-codigo">{{ $reporte->codigo }}</span>
                 @if ($reporte->es_apoyo)
@@ -49,5 +49,7 @@
                 </div>
             @endif
         </li>
-    @endforeach
+    @empty
+        <li class="fx-vacio">Todavía no hay reportes asociados a este caso.</li>
+    @endforelse
 </ol>

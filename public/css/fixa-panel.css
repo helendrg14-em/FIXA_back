@@ -358,13 +358,70 @@ body.fi-body { font-size: 1rem; color: var(--fx-tinta); }
     .fx-login-perfiles { display: none; }
 }
 
-/* ---------- Detalle del caso ---------- */
-/* Franja de datos: etiquetas pequeñas y valores firmes, sin aire de más entre filas. */
-.fx-caso-resumen .fi-in-entry { gap: .125rem; }
+/* ---------- Gestionar casos ---------- */
+.fx-casos-bandeja .fi-header, .fx-casos-detalle .fi-header {
+    border-radius: 18px;
+    padding: clamp(1rem, 2.6vw, 1.75rem);
+}
+.fx-casos-bandeja .fi-header {
+    background: radial-gradient(ellipse at 100% 0, rgba(156, 204, 60, .24), transparent 55%),
+                linear-gradient(120deg, var(--fx-bosque), var(--fx-bosque-2));
+}
+.fx-seguimiento-bandeja .fi-header {
+    background: radial-gradient(ellipse at 100% 0, rgba(46, 154, 88, .35), transparent 65%),
+                linear-gradient(120deg, var(--fx-bosque), var(--fx-bosque-2));
+    border-inline-start: .25rem solid var(--fx-brote);
+}
+.fx-casos-bandeja .fi-header-heading { color: #fff; }
+.fx-casos-bandeja .fi-header-subheading, .fx-casos-bandeja .fi-breadcrumbs-item-label { color: #dfe8d8; }
+.fx-casos-bandeja a.fi-breadcrumbs-item-label:hover { color: #fff; }
+.fx-casos-bandeja .fi-breadcrumbs .fi-icon { color: var(--fx-lima); }
+.fx-casos-detalle .fi-header {
+    background: linear-gradient(115deg, #fff, var(--fx-papel-2));
+    border: 1px solid var(--fx-linea);
+    border-inline-start: .25rem solid var(--fx-hoja);
+}
+.fx-casos-detalle .fi-header-subheading { color: var(--fx-tinta-2); }
+.fx-casos-detalle .fi-header-actions-ctn { max-width: 100%; }
+.fx-casos-detalle .fi-header-actions-ctn .fi-actions { flex-wrap: wrap; }
+.fx-casos-bandeja .fi-tabs {
+    gap: .25rem;
+    padding: .375rem;
+    border-radius: 14px;
+    box-shadow: 0 0 0 1px var(--fx-linea);
+}
+.fx-casos-bandeja .fi-tabs-item {
+    flex-shrink: 0;
+    min-height: 2.75rem;
+    border-radius: 10px;
+}
+.fx-casos-bandeja .fi-tabs-item.fi-active { background-color: var(--fx-bosque-2); }
+.fx-casos-bandeja .fi-tabs-item.fi-active .fi-tabs-item-label { color: #fff; }
+.fx-casos-bandeja .fi-tabs-item.fi-active .fi-badge { color: var(--fx-bosque); background-color: var(--fx-lima); }
+.fx-casos-bandeja .fi-ta-header-toolbar { background: #fff; }
+.fx-casos-bandeja .fi-ta-header-cell, .fx-casos-bandeja .fi-ta-actions-header-cell { background-color: var(--fx-papel-2); }
+.fx-casos-bandeja .fi-ta-row:hover, .fx-casos-bandeja .fi-ta-row:focus-within { background-color: #f3f8ee; }
+.fx-casos-bandeja .fx-caso-consultar {
+    display: inline-flex; justify-content: center; align-items: center; min-height: 2.75rem;
+    padding-inline: .65rem; border-radius: 10px; background: #edf5e8; color: #17643a;
+}
+.fx-casos-bandeja .fx-caso-consultar:hover { background: #dcebd3; }
+.fx-casos-bandeja .fx-caso-consultar > .fi-link-label { align-self: center; }
+
+/* ---------- Consultar caso ---------- */
+.fx-casos-detalle .fx-caso-seccion .fi-section-header {
+    background: linear-gradient(105deg, #edf5e8, var(--fx-papel));
+    border-bottom: 1px solid var(--fx-linea);
+    border-radius: 15px 15px 0 0;
+}
+.fx-casos-detalle .fx-caso-seccion .fi-section-header .fi-icon { color: #17643a; }
+.fx-casos-detalle .fx-caso-seccion .fi-section-header-heading { font-size: 1.0625rem; }
+.fx-caso-resumen .fi-in-entry { min-width: 0; gap: .25rem; }
 .fx-caso-resumen .fi-in-entry-label { font-size: .8125rem; color: var(--fx-tinta-2); font-weight: 600; }
 .fx-caso-resumen .fi-in-text-item { font-weight: 600; }
+.fx-casos-detalle .fx-caso-seguimiento, .fx-casos-detalle .fx-reporte { scroll-margin-top: 5.5rem; }
 
-/* Reportes e intervenciones: fichas separadas por una línea, no tarjetas dentro de tarjetas. */
+/* Fichas de reportes y evidencias. */
 .fx-reportes { display: grid; gap: 0; }
 .fx-reporte { padding: .875rem 0; border-top: 1px solid var(--fx-linea); }
 .fx-reporte:first-child { padding-top: 0; border-top: 0; }
@@ -377,6 +434,14 @@ body.fi-body { font-size: 1rem; color: var(--fx-tinta); }
 .fx-reporte-datos div { display: flex; gap: .375rem; }
 .fx-reporte-datos dt { color: var(--fx-tinta-2); }
 .fx-reporte-datos dd { color: var(--fx-tinta); font-weight: 600; }
+.fx-casos-detalle .fx-reporte:target {
+    border-radius: 10px;
+    outline: 2px solid var(--fx-hoja-viva);
+    outline-offset: .3rem;
+}
+.fx-casos-detalle .fx-reporte-meta, .fx-casos-detalle .fx-reporte-texto,
+.fx-casos-detalle .fx-reporte-datos dd, .fx-casos-detalle .fx-historial-detalle,
+.fx-casos-detalle .fx-historial-motivo { overflow-wrap: anywhere; }
 
 /* Botones principales de las órdenes del técnico: mismo ancho, así quedan alineados fila a fila. */
 .fi-btn.fx-boton-orden { width: 13.5rem; justify-content: center; }

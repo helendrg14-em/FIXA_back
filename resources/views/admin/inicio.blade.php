@@ -62,7 +62,7 @@
                 </div>
             </x-fixa.bloque>
 
-            <x-fixa.bloque titulo="Casos en curso" descripcion="Todas las unidades, sin contar cerrados, rechazados, duplicados ni derivados.">
+            <x-fixa.bloque titulo="Casos en curso" descripcion="Todas las unidades, sin contar cerrados, rechazados, duplicados ni derivados." :enlace="$urlCasos" texto-enlace="Gestionar casos">
                 <dl class="fx-datos">
                     <div>
                         <dt>Abiertos</dt>
@@ -77,12 +77,24 @@
         </div>
 
         <div class="fx-columna">
+            <x-fixa.bloque titulo="Operación">
+                <nav class="fx-accesos" aria-label="Operación">
+                    @foreach ($operacion as $acceso)
+                        <a class="fx-acceso" href="{{ $acceso['url'] }}">
+                            <span class="fx-acceso-icono"><x-filament::icon :icon="$acceso['icono']" /></span>
+                            <span class="fx-acceso-texto"><strong>{{ $acceso['titulo'] }}</strong></span>
+                            <x-filament::icon :icon="Heroicon::ChevronRight" class="fx-acceso-flecha" />
+                        </a>
+                    @endforeach
+                </nav>
+            </x-fixa.bloque>
+
             <x-fixa.bloque titulo="Configuración" descripcion="Lo que define cómo se atienden los reportes.">
                 <nav class="fx-accesos" aria-label="Configuración">
                     <a class="fx-acceso" href="{{ $urlCategorias }}">
                         <span class="fx-acceso-icono"><x-filament::icon :icon="Heroicon::OutlinedTag" /></span>
                         <span class="fx-acceso-texto">
-                            <strong>Categorías y plazos</strong>
+                            <strong>Gestionar categorías</strong>
                             <span>{{ $categoriasActivas }} de {{ $categorias }} {{ $categorias === 1 ? 'activa' : 'activas' }}</span>
                         </span>
                         <x-filament::icon :icon="Heroicon::ChevronRight" class="fx-acceso-flecha" />
@@ -105,7 +117,7 @@
                         <span class="fx-acceso-icono"><x-filament::icon :icon="Heroicon::OutlinedUsers" /></span>
                         <span class="fx-acceso-texto">
                             <strong>Usuarios</strong>
-                            <span>Crear, editar, desactivar y reenviar enlaces</span>
+                            <span>Editar, activar y restablecer contraseñas</span>
                         </span>
                         <x-filament::icon :icon="Heroicon::ChevronRight" class="fx-acceso-flecha" />
                     </a>

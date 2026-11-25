@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\EstadoCaso;
+use App\Filament\Pages\ConsultarSeguimiento;
 use App\Filament\Pages\NuevoReporte;
 use App\Filament\Resources\Casos\Pages\ListCasos;
 use App\Filament\Resources\Feriados\Pages\ManageFeriados;
@@ -54,7 +55,12 @@ class PanelDisenoTest extends TestCase
             ->assertCanSeeTableRecords([$porValidar])
             ->assertCanNotSeeTableRecords([$recibido])
             ->set('activeTab', 'cerrados')
-            ->assertCanSeeTableRecords([$cerrado]);
+            ->assertCanSeeTableRecords([$cerrado])
+            ->set('activeTab', 'todos')
+            ->assertCanSeeTableRecords([$recibido, $porValidar, $cerrado])
+            ->searchTable('#'.$cerrado->id)
+            ->assertCanSeeTableRecords([$cerrado])
+            ->assertCanNotSeeTableRecords([$recibido, $porValidar]);
     }
 
     public function test_el_detalle_muestra_el_reporte_y_el_historial_sin_campos_vacios(): void
@@ -68,6 +74,9 @@ class PanelDisenoTest extends TestCase
         EventoHistorial::forceCreate(['caso_id' => $caso->id, 'tipo' => 'registro', 'estado_nuevo' => 'recibida', 'detalle' => 'Reporte FX-2026-000777 registrado por app_movil.']);
 
         $this->get(route('filament.admin.resources.casos.view', $caso))->assertOk()
+            ->assertSee('Volver al seguimiento')
+            ->assertSee('href="'.e(ConsultarSeguimiento::getUrl()).'"', escape: false)
+            ->assertSee('Resumen del caso')
             ->assertSee('FX-2026-000777')
             ->assertSee('Bache profundo en la esquina')
             ->assertSee('Calle deteriorada')

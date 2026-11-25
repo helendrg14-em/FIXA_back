@@ -4,8 +4,8 @@ namespace App\Filament\Resources\Casos\Pages;
 
 use App\Auth\ServicioAutenticacion;
 use App\Enums\EstadoCaso;
-use App\Models\Caso;
 use App\Filament\Resources\Casos\CasoResource;
+use App\Models\Caso;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,15 +20,26 @@ class ListCasos extends ListRecords
 
     protected static ?string $title = 'Gestionar casos';
 
-    /** @var array<string, array{0: string, 1: list<EstadoCaso>|null}> */
+    /** @var array<string, array{0: string, 1: list<EstadoCaso>}> */
     private const ETAPAS = [
-        'abiertos' => ['Abiertos', null],
         'por_atender' => ['Por atender', [EstadoCaso::Recibida, EstadoCaso::EnRevision]],
         'en_curso' => ['En curso', [EstadoCaso::Asignada, EstadoCaso::Programada, EstadoCaso::EnAtencion]],
         'por_validar' => ['Por validar', [EstadoCaso::PendienteValidacion]],
         'cerrados' => ['Cerrados', [EstadoCaso::Cerrada]],
-        'otros' => ['Rechazados y derivados', [EstadoCaso::Rechazada, EstadoCaso::Duplicada, EstadoCaso::Derivada]],
+        'otros' => ['Otros cierres', [EstadoCaso::Rechazada, EstadoCaso::Duplicada, EstadoCaso::Derivada]],
     ];
+
+    public function getPageClasses(): array
+    {
+        return [...parent::getPageClasses(), 'fx-casos-bandeja'];
+    }
+
+    public function getSubheading(): ?string
+    {
+        return ServicioAutenticacion::getInstance()->esAdministrador()
+            ? 'Estado, prioridad y plazos de los casos de todas las unidades.'
+            : 'Revisa y gestiona los casos de tu unidad.';
+    }
 
     public function getTabs(): array
     {
@@ -37,11 +48,15 @@ class ListCasos extends ListRecords
         $conteos = Caso::query()->visiblesPara(ServicioAutenticacion::getInstance()->usuario())->toBase()
             ->select('estado')->selectRaw('count(*) as total')->groupBy('estado')->pluck('total', 'estado');
 
-        $tabs = [];
+        $abiertos = array_values(array_diff(array_column(EstadoCaso::cases(), 'value'), EstadoCaso::finales()));
+        $tabs = [
+            'abiertos' => Tab::make('Abiertos')->badge((string) $conteos->only($abiertos)->sum())
+                ->modifyQueryUsing(fn (Builder $query): Builder => $query->whereIn('estado', $abiertos)),
+            'todos' => Tab::make('Todos')->badge((string) $conteos->sum()),
+        ];
+
         foreach (self::ETAPAS as $clave => [$nombre, $estados]) {
-            $valores = $estados === null
-                ? array_values(array_diff(array_column(EstadoCaso::cases(), 'value'), EstadoCaso::finales()))
-                : array_map(fn (EstadoCaso $e): string => $e->value, $estados);
+            $valores = array_column($estados, 'value');
 
             $tabs[$clave] = Tab::make($nombre)
                 ->badge((string) $conteos->only($valores)->sum())
