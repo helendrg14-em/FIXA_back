@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\Login;
+use Filament\Actions\Action;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -46,6 +47,8 @@ class AdminPanelProvider extends PanelProvider
             ->spa()
             // Sin ->registration(): las cuentas las crea solo el administrador (R03).
             ->login(Login::class)
+            // Mismo nombre que el caso de uso «Cerrar sesión» (Filament en español dice «Salir»).
+            ->userMenuItems(['logout' => fn (Action $action): Action => $action->label('Cerrar sesión')])
             // Dos versiones del logo: la clara va sobre la barra lateral verde oscura (fixa-panel.css).
             ->brandLogo(fn (): HtmlString => new HtmlString(view('panel.logo')->render()))
             ->brandLogoHeight('2.25rem')
@@ -63,7 +66,7 @@ class AdminPanelProvider extends PanelProvider
             // Estilos de escritorio y, aparte, los de tablet y celular (public/movil).
             ->renderHook(PanelsRenderHook::STYLES_AFTER, fn (): HtmlString => new HtmlString('<link rel="stylesheet" href="'.e(recurso('css/fixa-panel.css')).'">'
                 .'<link rel="stylesheet" href="'.e(recurso('movil/css/panel.css')).'">'))
-            // Leaflet 1.9.4 para los mapas de «Nuevo reporte» y «Mapa». Se sirve desde public/js/leaflet
+            // Leaflet 1.9.4 para los mapas de «Gestionar reportes» y «Ver mapa». Se sirve desde public/js/leaflet
             // y no desde unpkg: no depende de otro sitio y Apache lo guarda en caché un año.
             // Va en la cabecera y no en cada página porque el panel navega sin recargar.
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): HtmlString => new HtmlString(

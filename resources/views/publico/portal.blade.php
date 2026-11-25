@@ -26,7 +26,7 @@
         <a class="barra-enlace" href="#que-pasa">Cómo funciona</a>
         <a class="barra-enlace" href="#otros">Otros casos</a>
         <a class="boton boton-verde boton-chico" href="{{ url('/admin') }}">
-            <x-fixa.icono nombre="usuario" /> Acceso funcionarios
+            <x-fixa.icono nombre="usuario" /> Iniciar sesión
         </a>
     </nav>
 </header>
@@ -199,7 +199,7 @@
     <ul class="pie-enlaces">
         <li><a href="#reportes">Qué reportar</a></li>
         <li><a href="#que-pasa">Cómo funciona</a></li>
-        <li><a href="{{ url('/admin') }}">Acceso de funcionarios</a></li>
+        <li><a href="{{ url('/admin') }}">Iniciar sesión</a></li>
     </ul>
     
 </footer>

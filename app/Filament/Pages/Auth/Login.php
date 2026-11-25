@@ -3,6 +3,7 @@
 namespace App\Filament\Pages\Auth;
 
 use App\Auth\ServicioAutenticacion;
+use Filament\Actions\Action;
 use Filament\Auth\Pages\Login as BaseLogin;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
@@ -20,7 +21,17 @@ class Login extends BaseLogin
 {
     public function getHeading(): string|Htmlable
     {
-        return 'Acceso de funcionarios';
+        return 'Iniciar sesión';
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return 'Iniciar sesión';
+    }
+
+    protected function getAuthenticateFormAction(): Action
+    {
+        return parent::getAuthenticateFormAction()->label('Iniciar sesión');
     }
 
     public function form(Schema $schema): Schema
