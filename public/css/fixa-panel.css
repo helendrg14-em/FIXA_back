@@ -378,6 +378,22 @@ body.fi-body { font-size: 1rem; color: var(--fx-tinta); }
 .fx-reporte-datos dt { color: var(--fx-tinta-2); }
 .fx-reporte-datos dd { color: var(--fx-tinta); font-weight: 600; }
 
+/* Botones principales de las órdenes del técnico: mismo ancho, así quedan alineados fila a fila. */
+.fi-btn.fx-boton-orden { width: 13.5rem; justify-content: center; }
+
+/* Orden del técnico: primero lo que pidió corregir el supervisor y cómo llegar al lugar. */
+.fx-orden { display: grid; gap: 1rem; }
+.fx-orden-correccion {
+    padding: .75rem .875rem; border-radius: .5rem; border-inline-start: .25rem solid var(--fx-naranja);
+    background: var(--fx-naranja-suave); color: var(--fx-tinta); line-height: 1.5;
+}
+.fx-orden-llegar {
+    justify-self: start; display: inline-flex; align-items: center; gap: .375rem;
+    color: var(--fx-hoja); font-weight: 700; text-decoration: underline; text-underline-offset: .2em;
+}
+.fx-orden-llegar:hover { color: var(--fx-hoja-viva); }
+.fx-orden-llegar:focus-visible { outline: 2px solid var(--fx-hoja); outline-offset: 2px; border-radius: .25rem; }
+
 .fx-chip {
     display: inline-flex; align-items: center; padding: .0625rem .5rem; border-radius: 999px;
     font-size: .75rem; font-weight: 700; color: #17643a; background: #edf5e8;
