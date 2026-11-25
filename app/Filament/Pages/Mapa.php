@@ -24,7 +24,7 @@ class Mapa extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMap;
 
-    protected static ?string $navigationLabel = 'Mapa';
+    protected static ?string $navigationLabel = 'Ver mapa';
 
     protected static ?string $title = 'Mapa de reportes';
 

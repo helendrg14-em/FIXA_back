@@ -42,9 +42,9 @@ class NuevoReporte extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPlusCircle;
 
-    protected static ?string $navigationLabel = 'Nuevo reporte';
+    protected static ?string $navigationLabel = 'Gestionar reportes';
 
-    protected static ?string $title = 'Nuevo reporte';
+    protected static ?string $title = 'Gestionar reportes';
 
     protected static ?int $navigationSort = 2;
 

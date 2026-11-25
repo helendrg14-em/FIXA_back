@@ -36,7 +36,7 @@ class CasoResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInboxStack;
 
-    protected static ?string $navigationLabel = 'Casos';
+    protected static ?string $navigationLabel = 'Gestionar casos';
 
     protected static ?string $modelLabel = 'caso';
 
@@ -58,7 +58,7 @@ class CasoResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false; // los reportes nuevos se cargan con «Nuevo reporte»
+        return false; // los reportes nuevos se cargan con «Gestionar reportes»
     }
 
     public static function getEloquentQuery(): Builder
@@ -90,7 +90,12 @@ class CasoResource extends Resource
             ->defaultSort(fn (Builder $query): Builder => $query->orderByDesc('vencido')->orderByRaw('fecha_objetivo is null, fecha_objetivo')->orderByDesc('id'))
             ->columns([
                 // En celular quedan caso, categoría y estado; lo demás aparece desde tablet.
+                // Consultar seguimiento: el funcionario busca por el número del caso o por el
+                // código FX que le dicta el vecino, y abre el caso con su historial.
                 TextColumn::make('id')->label('Caso')->prefix('#')->sortable()->weight('bold')
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->where(fn (Builder $q) => $q
+                        ->when(ctype_digit(trim($search)), fn (Builder $q) => $q->orWhere('id', (int) trim($search)))
+                        ->orWhereHas('reportes', fn (Builder $r) => $r->where('codigo', 'like', '%'.mb_strtoupper(trim($search)).'%'))))
                     ->icon(fn (Caso $record): ?Heroicon => $record->vencido ? Heroicon::ExclamationTriangle : null)
                     ->iconColor('danger')->tooltip(fn (Caso $record): ?string => $record->vencido ? 'Vencido' : null),
                 TextColumn::make('categoria.nombre')->label('Categoría')->wrap()
@@ -118,7 +123,8 @@ class CasoResource extends Resource
             ->filtersFormColumns(['default' => 1, 'sm' => 2, 'lg' => $esAdmin ? 4 : 3])
             ->deferFilters(false)
             ->recordUrl(fn (Caso $record): string => self::getUrl('view', ['record' => $record]))
-            ->recordActions([ViewAction::make()->label('Abrir')])
+            ->searchPlaceholder('N.º de caso o código FX del vecino')
+            ->recordActions([ViewAction::make()->label('Consultar seguimiento')->icon(Heroicon::OutlinedClock)])
             ->emptyStateIcon(Heroicon::OutlinedInboxStack)
             ->emptyStateHeading('No hay casos aquí')
             ->emptyStateDescription('Los reportes de la app aparecen apenas se envían. Prueba otra pestaña o quita los filtros.');
@@ -166,7 +172,7 @@ class CasoResource extends Resource
                         ->compact()->icon(Heroicon::OutlinedChatBubbleBottomCenterText)
                         ->schema([ViewEntry::make('reportes')->hiddenLabel()->view('panel.caso.reportes')]),
                 ]),
-                Section::make('Historial')->compact()->icon(Heroicon::OutlinedClock)->columnSpan(1)
+                Section::make('Seguimiento')->compact()->icon(Heroicon::OutlinedClock)->columnSpan(1)
                     ->schema([ViewEntry::make('eventos')->hiddenLabel()->view('panel.caso.historial')]),
             ]),
         ]);

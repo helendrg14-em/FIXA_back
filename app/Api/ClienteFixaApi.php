@@ -73,6 +73,35 @@ class ClienteFixaApi
         $this->enviar(fn (PendingRequest $h) => $h->post("casos/revisiones/{$solicitudId}", ['aceptar' => $aceptar, 'respuesta' => $respuesta]));
     }
 
+    // ---------------------------------------------------------------- Órdenes del técnico
+
+    public function iniciarAtencion(int $casoId): void
+    {
+        $this->enviar(fn (PendingRequest $h) => $h->post("ordenes/{$casoId}/inicio"));
+    }
+
+    /**
+     * El técnico registra el trabajo con su evidencia (R10). No cierra el caso: queda esperando
+     * la validación del supervisor.
+     *
+     * @param  list<string>  $fotos  rutas de las fotos (JPG, PNG o WebP)
+     */
+    public function registrarIntervencion(int $casoId, string $trabajo, string $tipoEvidencia, ?string $descripcion, array $fotos): void
+    {
+        $this->enviar(function (PendingRequest $h) use ($casoId, $trabajo, $tipoEvidencia, $descripcion, $fotos) {
+            $h->asMultipart();
+            foreach ($fotos as $i => $ruta) {
+                $h->attach('fotos', file_get_contents($ruta), 'evidencia'.($i + 1).'.'.pathinfo($ruta, PATHINFO_EXTENSION));
+            }
+
+            return $h->post("ordenes/{$casoId}/intervenciones", array_filter([
+                'trabajoRealizado' => $trabajo,
+                'tipoEvidencia' => $tipoEvidencia,
+                'descripcion' => $descripcion,
+            ], fn ($valor) => $valor !== null && $valor !== ''));
+        });
+    }
+
     // ---------------------------------------------------------------- Reportes
 
     /**

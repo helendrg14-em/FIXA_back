@@ -34,7 +34,7 @@ class CategoriaResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
-    protected static ?string $navigationLabel = 'Categorías';
+    protected static ?string $navigationLabel = 'Gestionar categorías';
 
     protected static ?string $modelLabel = 'categoría';
 

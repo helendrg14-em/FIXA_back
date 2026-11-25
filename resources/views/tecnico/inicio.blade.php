@@ -47,6 +47,17 @@
                 @if ($totalAgenda > $agenda->count())
                     <p class="fx-ayuda">Se muestran los {{ $agenda->count() }} más próximos de {{ $totalAgenda }}.</p>
                 @endif
+
+                <nav class="fx-accesos" aria-label="Trabajo de la cuadrilla">
+                    <a class="fx-acceso" href="{{ \App\Filament\Pages\GestionarIntervencion::getUrl() }}">
+                        <span class="fx-acceso-icono"><x-filament::icon :icon="Heroicon::OutlinedWrenchScrewdriver" /></span>
+                        <span class="fx-acceso-texto">
+                            <strong>Gestionar intervención</strong>
+                            <span>Inicia la atención y registra el trabajo con su foto</span>
+                        </span>
+                        <x-filament::icon :icon="Heroicon::ChevronRight" class="fx-acceso-flecha" />
+                    </a>
+                </nav>
             </x-fixa.bloque>
 
             <x-fixa.bloque titulo="Tu semana" class="fx-area-semana">

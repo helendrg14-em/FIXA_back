@@ -18,6 +18,8 @@ class ListCasos extends ListRecords
 {
     protected static string $resource = CasoResource::class;
 
+    protected static ?string $title = 'Gestionar casos';
+
     /** @var array<string, array{0: string, 1: list<EstadoCaso>|null}> */
     private const ETAPAS = [
         'abiertos' => ['Abiertos', null],
