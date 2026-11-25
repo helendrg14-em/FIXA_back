@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\EstadoCaso;
 use App\Enums\TipoUsuario;
 use App\Filament\Pages\GestionarIntervencion;
+use App\Filament\Resources\Casos\CasoResource;
 use App\Filament\Resources\Casos\Pages\ListCasos;
 use App\Models\Caso;
 use App\Models\Categoria;
@@ -162,7 +163,7 @@ class GestionarIntervencionTest extends TestCase
         $this->get('/admin')->assertOk()->assertSee('Gestionar intervención');
     }
 
-    public function test_consultar_seguimiento_busca_el_caso_por_el_codigo_del_vecino(): void
+    public function test_la_bandeja_busca_por_codigo_sin_mostrar_el_enlace_al_detalle(): void
     {
         $this->actingAs($this->usuario());
 
@@ -170,6 +171,9 @@ class GestionarIntervencionTest extends TestCase
             ->searchTable('fx-2026-00000'.$this->enAtencion->id)
             ->assertCanSeeTableRecords([$this->enAtencion])
             ->assertCanNotSeeTableRecords([$this->programado])
-            ->assertSee('Consultar seguimiento');
+            ->assertDontSee('Consultar caso')
+            ->assertDontSee(CasoResource::getUrl('view', ['record' => $this->enAtencion]))
+            ->assertTableColumnHidden('reportes_count')
+            ->assertTableColumnHidden('fecha_creacion');
     }
 }

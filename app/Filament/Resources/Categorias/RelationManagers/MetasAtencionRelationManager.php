@@ -3,24 +3,24 @@
 namespace App\Filament\Resources\Categorias\RelationManagers;
 
 use App\Enums\Prioridad;
+use App\Models\Categoria;
 use App\Models\MetaAtencion;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Filament\Actions\CreateAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 /**
- * R03 / RN-06: plazos de atención por prioridad. Un plazo nuevo cierra el vigente de esa
- * prioridad en lugar de editarlo, para conservar el historial. La medida elegida es la
- * columna que se llena: plazo_horas o plazo_dias_habiles.
+ * R03 / RN-06: cada cambio registra una versión del plazo para conservar el historial.
  */
 class MetasAtencionRelationManager extends RelationManager
 {
@@ -42,10 +42,11 @@ class MetasAtencionRelationManager extends RelationManager
             Select::make('medida')->label('Se cuenta en')->required()->native(false)->live()
                 ->options(['plazo_horas' => 'Horas corridas', 'plazo_dias_habiles' => 'Días hábiles'])
                 ->helperText('Los días hábiles no cuentan sábados, domingos ni feriados.'),
-            DatePicker::make('vigente_desde')->label('Desde')->required()->default(today())->native(false)
-                ->helperText('Fecha de inicio del plazo.'),
-            DatePicker::make('vigente_hasta')->label('Hasta')->native(false)
-                ->helperText('Dejar en blanco si el plazo sigue vigente.'),
+            DatePicker::make('vigente_desde')->label('Desde')->required()->default(fn () => self::hoy())
+                ->minDate(fn () => self::hoy())->native(false)
+                ->helperText('El plazo anterior se aplica hasta el día previo a este cambio.'),
+            DatePicker::make('vigente_hasta')->label('Hasta')->native(false)->afterOrEqual('vigente_desde')
+                ->helperText('Deja en blanco para aplicar el plazo hasta que empiece el siguiente.'),
         ]);
     }
 
@@ -63,53 +64,66 @@ class MetasAtencionRelationManager extends RelationManager
                 TextColumn::make('vigente_desde')->label('Desde')->date('d/m/Y'),
                 TextColumn::make('vigente_hasta')->label('Hasta')->date('d/m/Y')->placeholder('—'),
                 TextColumn::make('estado')->label('Estado')
-                    ->state(fn (MetaAtencion $record): string => $record->vigente_hasta === null ? 'Vigente' : 'Histórico')
-                    ->badge()
-                    ->color(fn (string $state): string => $state === 'Vigente' ? 'success' : 'gray'),
-            ])
-            ->recordActions([
-                EditAction::make()
-                    ->label('Editar')
-                    ->modalHeading('Editar plazo de atención')
-                    ->mutateRecordDataUsing(function (array $data, MetaAtencion $record): array {
-                        // Hidrata el campo virtual "medida" a partir de qué columna tiene valor.
-                        $data['medida']  = $record->plazo_horas !== null ? 'plazo_horas' : 'plazo_dias_habiles';
-                        $data['plazo']   = $record->plazo_horas ?? $record->plazo_dias_habiles;
-                        return $data;
+                    ->state(fn (MetaAtencion $record): string => match (true) {
+                        $record->vigente_desde->toDateString() > self::hoy()->toDateString() => 'Programado',
+                        $record->vigente_hasta !== null && $record->vigente_hasta->toDateString() < self::hoy()->toDateString() => 'Histórico',
+                        default => 'Vigente',
                     })
-                    ->using(function (MetaAtencion $record, array $data): MetaAtencion {
-                        $medida  = $data['medida'];
-                        $opuesta = $medida === 'plazo_horas' ? 'plazo_dias_habiles' : 'plazo_horas';
-
-                        $record->update([
-                            'prioridad'    => $data['prioridad'],
-                            $medida        => $data['plazo'],
-                            $opuesta       => null,
-                            'vigente_desde' => $data['vigente_desde'],
-                            'vigente_hasta' => $data['vigente_hasta'] ?? null,
-                        ]);
-
-                        return $record;
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Vigente' => 'success', 'Programado' => 'info', default => 'gray',
                     }),
             ])
             ->headerActions([
                 CreateAction::make()->label('Definir plazo')->modalHeading('Definir plazo de atención')->createAnother(false)
-                    ->using(function (array $data, RelationManager $livewire): MetaAtencion {
-                        $categoria = $livewire->getOwnerRecord();
-                        $prioridad = $data['prioridad'] instanceof Prioridad ? $data['prioridad']->value : $data['prioridad'];
-
-                        return DB::transaction(function () use ($categoria, $prioridad, $data): MetaAtencion {
-                            $categoria->metasAtencion()->where('prioridad', $prioridad)->whereNull('vigente_hasta')
-                                ->update(['vigente_hasta' => today()]);
-
-                            return $categoria->metasAtencion()->create([
-                                'prioridad'    => $prioridad,
-                                $data['medida'] => $data['plazo'],
-                                'vigente_desde' => $data['vigente_desde'] ?? today(),
-                                'vigente_hasta' => $data['vigente_hasta'] ?? null,
-                            ]);
-                        });
-                    }),
+                    ->using(fn (array $data): MetaAtencion => $this->guardarPlazo($data)),
             ]);
+    }
+
+    private function guardarPlazo(array $data): MetaAtencion
+    {
+        $inicio = CarbonImmutable::parse($data['vigente_desde'], config('fixa.zona_horaria'));
+        $desde = $inicio->toDateString();
+        $hasta = $data['vigente_hasta'] ?? null;
+        $prioridad = $data['prioridad'] instanceof Prioridad ? $data['prioridad']->value : $data['prioridad'];
+        $formulario = $this->getMountedActionSchema()->getStatePath();
+
+        return DB::transaction(function () use ($data, $desde, $hasta, $inicio, $prioridad, $formulario): MetaAtencion {
+            $categoria = Categoria::query()->lockForUpdate()->findOrFail($this->getOwnerRecord()->getKey());
+            $plazos = $categoria->metasAtencion()->where('prioridad', $prioridad);
+            $siguiente = (clone $plazos)->where('vigente_desde', '>=', $desde)->orderBy('vigente_desde')->first();
+
+            if ($siguiente?->vigente_desde->toDateString() === $desde) {
+                throw ValidationException::withMessages([
+                    "{$formulario}.vigente_desde" => 'Ya hay un plazo para esa prioridad que comienza ese día. Elige otra fecha.',
+                ]);
+            }
+
+            if ($siguiente !== null) {
+                if ($hasta !== null && $hasta >= $siguiente->vigente_desde->toDateString()) {
+                    throw ValidationException::withMessages([
+                        "{$formulario}.vigente_hasta" => 'El plazo debe terminar antes de que comience el siguiente plazo programado.',
+                    ]);
+                }
+
+                $hasta ??= $siguiente->vigente_desde->copy()->subDay()->toDateString();
+            }
+
+            $plazos->where('vigente_desde', '<', $desde)
+                ->where(fn ($query) => $query->whereNull('vigente_hasta')->orWhere('vigente_hasta', '>=', $desde))
+                ->update(['vigente_hasta' => $inicio->subDay()->toDateString()]);
+
+            return $categoria->metasAtencion()->create([
+                'prioridad' => $prioridad,
+                $data['medida'] => $data['plazo'],
+                'vigente_desde' => $desde,
+                'vigente_hasta' => $hasta,
+            ]);
+        });
+    }
+
+    private static function hoy(): CarbonInterface
+    {
+        return today(config('fixa.zona_horaria'));
     }
 }

@@ -80,16 +80,34 @@ class PlazosTest extends TestCase
         $this->seed(CatalogosSeeder::class);
         $this->actingAs($this->usuario());
         $categoria = Categoria::firstOrFail();
+        $inicio = today(config('fixa.zona_horaria'))->addDays(2);
 
         Livewire::test(MetasAtencionRelationManager::class, ['ownerRecord' => $categoria, 'pageClass' => EditCategoria::class])
-            ->callTableAction('create', data: ['prioridad' => Prioridad::Baja->value, 'plazo' => 10, 'medida' => 'plazo_dias_habiles'])
-            ->assertHasNoTableActionErrors();
+            ->callTableAction('create', data: [
+                'prioridad' => Prioridad::Baja->value,
+                'plazo' => 10,
+                'medida' => 'plazo_dias_habiles',
+                'vigente_desde' => $inicio->toDateString(),
+            ])
+            ->assertHasNoTableActionErrors()
+            ->assertSee('Programado');
 
-        $vigentes = $categoria->metasAtencion()->where('prioridad', Prioridad::Baja->value)->whereNull('vigente_hasta')->get();
+        $plazos = $categoria->metasAtencion()->where('prioridad', Prioridad::Baja->value)->orderBy('vigente_desde')->get();
+        $this->assertCount(2, $plazos);
+        [$anterior, $programado] = $plazos->all();
+        $this->assertSame($inicio->copy()->subDay()->toDateString(), $anterior->vigente_hasta->toDateString());
+        $this->assertSame(10, $programado->plazo_dias_habiles);
+        $this->assertNull($programado->plazo_horas);
+        $this->assertNull($programado->vigente_hasta);
 
-        $this->assertCount(1, $vigentes);
-        $this->assertSame(10, $vigentes->first()->plazo_dias_habiles);
-        $this->assertNull($vigentes->first()->plazo_horas);
+        Livewire::test(MetasAtencionRelationManager::class, ['ownerRecord' => $categoria, 'pageClass' => EditCategoria::class])
+            ->callTableAction('create', data: [
+                'prioridad' => Prioridad::Baja->value,
+                'plazo' => 12,
+                'medida' => 'plazo_dias_habiles',
+                'vigente_desde' => $inicio->toDateString(),
+            ])
+            ->assertHasTableActionErrors(['vigente_desde']);
         $this->assertSame(2, $categoria->metasAtencion()->where('prioridad', Prioridad::Baja->value)->count());
     }
 

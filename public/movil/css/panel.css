@@ -42,8 +42,23 @@
     .fx-datos dd { font-size: 1.625rem; }
 }
 
-/* Calendario de feriados y detalle del caso en celular */
+/* Casos y calendario de feriados en celular */
 @media (max-width: 40rem) {
+    .fx-casos-bandeja .fi-tabs { max-width: 100%; }
+    .fx-casos-bandeja .fi-ta-header-toolbar > .fi-ta-actions:not(:has(*)) { display: none; }
+    .fx-casos-bandeja .fi-ta-table { table-layout: fixed; }
+    .fx-casos-bandeja .fx-caso-id-columna, .fx-casos-bandeja .fi-ta-actions-header-cell { width: 3.5rem; }
+    .fx-casos-bandeja .fx-caso-estado-columna { width: 32%; }
+    .fx-casos-bandeja .fi-ta-cell .fi-ta-text { padding-inline: .5rem; }
+    .fx-casos-bandeja .fi-ta-cell .fi-badge { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+    .fx-casos-bandeja .fi-ta-cell:has(> .fi-ta-actions) { padding-inline: .375rem; }
+    .fx-casos-bandeja .fx-caso-consultar { min-width: 2.75rem; }
+    .fx-casos-bandeja .fx-caso-consultar .fi-link-label {
+        position: absolute; width: 1px; height: 1px; overflow: hidden;
+        clip-path: inset(50%); white-space: nowrap;
+    }
+    .fx-casos-detalle .fi-header .fi-header-actions-ctn { width: 100%; }
+    .fx-casos-detalle .fi-header-subheading { overflow-wrap: anywhere; }
     .fx-cal { padding: .875rem .75rem 1rem; }
     .fx-cal-rejilla { gap: .25rem; }
     .fx-cal-dia { min-height: 3rem; padding: .375rem; border-radius: 9px; align-items: center; }

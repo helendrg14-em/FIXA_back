@@ -9,7 +9,6 @@ use App\Enums\CanalOrigen;
 use App\Filament\Resources\Casos\CasoResource;
 use App\Models\Categoria;
 use App\Models\Reporte;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Radio;
@@ -40,13 +39,9 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
  */
 class NuevoReporte extends Page
 {
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPlusCircle;
+    protected static ?string $title = 'Registrar reporte asistido';
 
-    protected static ?string $navigationLabel = 'Gestionar reportes';
-
-    protected static ?string $title = 'Gestionar reportes';
-
-    protected static ?int $navigationSort = 2;
+    protected static bool $shouldRegisterNavigation = false;
 
     /** @var array<string, mixed>|null */
     public ?array $data = [];
@@ -62,6 +57,14 @@ class NuevoReporte extends Page
     public function mount(): void
     {
         $this->form->fill(['canal' => CanalOrigen::Telefono->value, 'latitud' => -17.7834, 'longitud' => -63.1821]);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('volverAReportes')->label('Volver a reportes')->icon(Heroicon::OutlinedArrowLeft)
+                ->url(GestionarReportes::getUrl())->color('gray'),
+        ];
     }
 
     public function form(Schema $schema): Schema
@@ -129,7 +132,7 @@ class NuevoReporte extends Page
                 ->footerActions([
                     Action::make('verCaso')->label('Ver el caso')->link()
                         ->url(fn (): ?string => ($caso = Reporte::query()->where('codigo', $this->creado['codigo'] ?? '')->value('caso_id'))
-                            ? CasoResource::getUrl('view', ['record' => $caso]) : null),
+                            ? CasoResource::getUrl('view-reportes', ['record' => $caso]) : null),
                 ]),
             Form::make([EmbeddedSchema::make('form')])
                 ->id('form')

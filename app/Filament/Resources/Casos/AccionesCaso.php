@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Casos;
 
 use App\Api\ClienteFixaApi;
 use App\Api\ErrorApi;
+use App\Auth\ServicioAutenticacion;
 use App\Enums\EstadoCaso;
 use App\Enums\Prioridad;
 use App\Models\Caso;
@@ -94,7 +95,9 @@ final class AccionesCaso
             ->visible(fn (Caso $record): bool => $record->estado === EstadoCaso::PendienteValidacion)
             ->requiresConfirmation()
             ->modalHeading('Aprobar el trabajo y cerrar el caso')
-            ->modalDescription('Revisa antes la foto del después. El vecino podrá confirmar la solución o pedir revisión durante 15 días.')
+            ->modalDescription(fn (): string => ServicioAutenticacion::getInstance()->esAdministrador()
+                ? 'Revisa la evidencia del trabajo antes de cerrar. El vecino podrá confirmar la solución o pedir revisión durante 15 días.'
+                : 'Revisa antes la foto del después. El vecino podrá confirmar la solución o pedir revisión durante 15 días.')
             ->schema([Textarea::make('observacion')->label('Observación (opcional)')->maxLength(1000)])
             ->action(fn (Caso $record, array $data) => self::ejecutar(
                 fn (ClienteFixaApi $api) => $api->validarIntervencion(self::intervencion($record), true, $data['observacion'] ?? null),

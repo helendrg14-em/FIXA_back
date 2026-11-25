@@ -4,6 +4,10 @@ namespace App\Filament\Widgets\Admin;
 
 use App\Enums\EstadoCaso;
 use App\Enums\TipoUsuario;
+use App\Filament\Pages\ConsultarSeguimiento;
+use App\Filament\Pages\ControlIntervenciones;
+use App\Filament\Pages\GestionarReportes;
+use App\Filament\Resources\Casos\CasoResource;
 use App\Filament\Resources\Categorias\CategoriaResource;
 use App\Filament\Resources\Feriados\FeriadoResource;
 use App\Filament\Resources\Usuarios\UsuarioResource;
@@ -49,6 +53,12 @@ class ResumenAdmin extends ResumenDeInicio
             'urlNuevoUsuario' => UsuarioResource::getUrl('create'),
             'urlCategorias' => CategoriaResource::getUrl('index'),
             'urlFeriados' => FeriadoResource::getUrl('index'),
+            'urlCasos' => CasoResource::getUrl('index'),
+            'operacion' => [
+                ['titulo' => 'Gestionar reportes', 'url' => GestionarReportes::getUrl(), 'icono' => GestionarReportes::getNavigationIcon()],
+                ['titulo' => 'Consultar seguimiento', 'url' => ConsultarSeguimiento::getUrl(), 'icono' => ConsultarSeguimiento::getNavigationIcon()],
+                ['titulo' => 'Gestionar intervención', 'url' => ControlIntervenciones::getUrl(), 'icono' => ControlIntervenciones::getNavigationIcon()],
+            ],
         ];
     }
 }

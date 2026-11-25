@@ -10,6 +10,7 @@ use App\Filament\Resources\Casos\Pages\ListCasos;
 use App\Filament\Resources\Casos\Pages\ViewCaso;
 use App\Models\Caso;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
@@ -81,50 +82,67 @@ class CasoResource extends Resource
         return 'Recibidos y pendientes de validar';
     }
 
+    public static function getNavigationItemActiveRoutePattern(): string|array
+    {
+        return ServicioAutenticacion::getInstance()->esAdministrador()
+            ? ListCasos::getRouteName()
+            : parent::getNavigationItemActiveRoutePattern();
+    }
+
     public static function table(Table $table): Table
     {
         $esAdmin = ServicioAutenticacion::getInstance()->esAdministrador();
+        $bandejaAdmin = $esAdmin && $table->getLivewire() instanceof ListCasos;
 
         return $table
             // Primero los vencidos y luego los que vencen antes, como la bandeja de la API.
             ->defaultSort(fn (Builder $query): Builder => $query->orderByDesc('vencido')->orderByRaw('fecha_objetivo is null, fecha_objetivo')->orderByDesc('id'))
             ->columns([
                 // En celular quedan caso, categoría y estado; lo demás aparece desde tablet.
-                // Consultar seguimiento: el funcionario busca por el número del caso o por el
-                // código FX que le dicta el vecino, y abre el caso con su historial.
+                // La búsqueda admite el número de caso y el código FX del reporte.
                 TextColumn::make('id')->label('Caso')->prefix('#')->sortable()->weight('bold')
-                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->where(fn (Builder $q) => $q
-                        ->when(ctype_digit(trim($search)), fn (Builder $q) => $q->orWhere('id', (int) trim($search)))
-                        ->orWhereHas('reportes', fn (Builder $r) => $r->where('codigo', 'like', '%'.mb_strtoupper(trim($search)).'%'))))
+                    ->extraHeaderAttributes(['class' => 'fx-caso-id-columna'])
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        $referencia = trim($search);
+                        $numero = ltrim($referencia, '#');
+
+                        return $query->where(fn (Builder $casos): Builder => $casos
+                            ->when(ctype_digit($numero), fn (Builder $casos): Builder => $casos->orWhere('id', (int) $numero))
+                            ->orWhereHas('reportes', fn (Builder $reportes): Builder => $reportes->where('codigo', 'like', '%'.mb_strtoupper($referencia).'%')));
+                    })
                     ->icon(fn (Caso $record): ?Heroicon => $record->vencido ? Heroicon::ExclamationTriangle : null)
                     ->iconColor('danger')->tooltip(fn (Caso $record): ?string => $record->vencido ? 'Vencido' : null),
-                TextColumn::make('categoria.nombre')->label('Categoría')->wrap()
+                TextColumn::make('categoria.nombre')->label('Categoría')->weight('medium')->wrap()
                     ->description(fn (Caso $record): ?string => $esAdmin ? $record->unidad?->sigla : null),
-                TextColumn::make('estado')->badge()->color(fn (EstadoCaso $state): string => self::colorEstado($state)),
+                TextColumn::make('estado')->badge()
+                    ->extraHeaderAttributes(['class' => 'fx-caso-estado-columna'])
+                    ->color(fn (EstadoCaso $state): string => self::colorEstado($state)),
                 TextColumn::make('prioridad')->badge()->placeholder('Sin asignar')->visibleFrom('md')
                     ->color(fn (?Prioridad $state): string => match ($state) {
                         Prioridad::Critica => 'danger', Prioridad::Alta => 'warning', default => 'gray',
                     }),
-                TextColumn::make('reportes_count')->label('Vecinos')->alignCenter()->visibleFrom('md'),
-                TextColumn::make('fecha_creacion')->label('Recibido')->since()->sortable()
+                TextColumn::make('reportes_count')->label('Reportes')->alignCenter()->hidden($esAdmin)->visibleFrom('md'),
+                TextColumn::make('fecha_creacion')->label('Recibido')->since()->sortable()->hidden($esAdmin)
                     ->tooltip(fn (Caso $record): ?string => $record->fecha_creacion?->format('d/m/Y H:i'))->visibleFrom('md'),
                 TextColumn::make('fecha_objetivo')->label('Vence')->date('d/m/Y')->placeholder('—')->sortable()->visibleFrom('md')
                     ->color(fn (Caso $record): ?string => $record->vencido ? 'danger' : null),
             ])
-            // El estado va en las pestañas (ListCasos); aquí quedan los filtros finos, en una fila
-            // sobre la tabla que se pliega, en vez de un desplegable más alto que la pantalla.
             ->filters([
                 SelectFilter::make('categoria_id')->label('Categoría')->relationship('categoria', 'nombre')->native(false),
                 SelectFilter::make('unidad_id')->label('Unidad')->relationship('unidad', 'sigla')->native(false)->visible($esAdmin),
                 SelectFilter::make('prioridad')->options(Prioridad::class)->native(false),
                 Filter::make('vencido')->label('Solo vencidos')->toggle()
                     ->query(fn (Builder $query): Builder => $query->where('vencido', true)),
-            ], layout: FiltersLayout::AboveContentCollapsible)
-            ->filtersFormColumns(['default' => 1, 'sm' => 2, 'lg' => $esAdmin ? 4 : 3])
+            ], layout: FiltersLayout::Modal)
+            ->filtersTriggerAction(fn (Action $action): Action => $action->button()->outlined()->label('Filtros'))
+            ->filtersFormColumns(['default' => 1, 'sm' => 2])
             ->deferFilters(false)
-            ->recordUrl(fn (Caso $record): string => self::getUrl('view', ['record' => $record]))
-            ->searchPlaceholder('N.º de caso o código FX del vecino')
-            ->recordActions([ViewAction::make()->label('Consultar seguimiento')->icon(Heroicon::OutlinedClock)])
+            ->recordUrl($bandejaAdmin ? null : fn (Caso $record): string => self::getUrl('view', ['record' => $record]))
+            ->searchPlaceholder('Caso o código FX')
+            ->recordActions($esAdmin ? [] : [
+                ViewAction::make()->label('Consultar caso')->icon(Heroicon::OutlinedEye)->tooltip('Consultar caso')
+                    ->extraAttributes(['class' => 'fx-caso-consultar']),
+            ])
             ->emptyStateIcon(Heroicon::OutlinedInboxStack)
             ->emptyStateHeading('No hay casos aquí')
             ->emptyStateDescription('Los reportes de la app aparecen apenas se envían. Prueba otra pestaña o quita los filtros.');
@@ -137,23 +155,22 @@ class CasoResource extends Resource
         $vacio = fn (mixed $state): bool => blank($state);
 
         return $schema->columns(1)->components([
-            Section::make()->compact()->extraAttributes(['class' => 'fx-caso-resumen'])
-                ->columns(['default' => 2, 'md' => 3, 'xl' => 6])
+            Section::make('Resumen del caso')->compact()->icon(Heroicon::OutlinedClipboardDocumentList)
+                ->extraAttributes(['class' => 'fx-caso-resumen fx-caso-seccion'])
+                ->columns(['default' => 2, 'md' => 3, 'xl' => 4])
                 ->schema([
                     TextEntry::make('estado')->badge()->color(fn (EstadoCaso $state): string => self::colorEstado($state)),
                     TextEntry::make('prioridad')->badge()->placeholder('Sin asignar')
                         ->color(fn (?Prioridad $state): string => match ($state) {
                             Prioridad::Critica => 'danger', Prioridad::Alta => 'warning', default => 'gray',
                         }),
-                    TextEntry::make('categoria.nombre')->label('Categoría'),
-                    TextEntry::make('unidad.nombre')->label('Unidad'),
                     TextEntry::make('fecha_creacion')->label('Recibido')->dateTime('d/m/Y H:i'),
-                    TextEntry::make('fecha_objetivo')->label('Vence')->date('d/m/Y')
+                    TextEntry::make('fecha_objetivo')->label('Fecha límite')->date('d/m/Y')
                         ->placeholder('Al fijar la prioridad')
                         ->color(fn (Caso $record): ?string => $record->vencido ? 'danger' : null)
                         ->suffix(fn (Caso $record): string => $record->vencido ? ' · vencido' : ''),
-                    TextEntry::make('programacion')->label('Programado')
-                        ->state(fn (Caso $record): ?string => ($p = $record->programaciones()->where('vigente', true)->with('cuadrilla')->first())
+                    TextEntry::make('programacion')->label('Cuadrilla programada')
+                        ->state(fn (Caso $record): ?string => ($p = $record->programacionVigente()->with('cuadrilla')->first())
                             ? "{$p->cuadrilla?->nombre} · {$p->fecha_prevista->format('d/m/Y')}" : null)
                         ->hidden($vacio),
                     TextEntry::make('fecha_cierre')->label('Cerrado')->dateTime('d/m/Y H:i')->hidden($vacio),
@@ -165,14 +182,16 @@ class CasoResource extends Resource
             Grid::make(['default' => 1, 'lg' => 3])->schema([
                 Grid::make(1)->columnSpan(['default' => 1, 'lg' => 2])->schema([
                     Section::make('Trabajo de la cuadrilla')->compact()->icon(Heroicon::OutlinedWrenchScrewdriver)
+                        ->extraAttributes(['class' => 'fx-caso-seccion'])
                         ->hidden(fn (Caso $record): bool => ! $record->intervenciones()->exists())
                         ->schema([ViewEntry::make('intervenciones')->hiddenLabel()->view('panel.caso.intervenciones')]),
-                    Section::make(fn (Caso $record): string => $record->reportes_count > 1
-                        ? "Lo que reportaron {$record->reportes_count} vecinos" : 'Lo que reportó el vecino')
+                    Section::make('Reportes asociados')
                         ->compact()->icon(Heroicon::OutlinedChatBubbleBottomCenterText)
+                        ->extraAttributes(['class' => 'fx-caso-seccion'])
                         ->schema([ViewEntry::make('reportes')->hiddenLabel()->view('panel.caso.reportes')]),
                 ]),
-                Section::make('Seguimiento')->compact()->icon(Heroicon::OutlinedClock)->columnSpan(1)
+                Section::make('Seguimiento')->id('historial-caso')->compact()->icon(Heroicon::OutlinedClock)->columnSpan(1)
+                    ->extraAttributes(['class' => 'fx-caso-seccion fx-caso-seguimiento'])
                     ->schema([ViewEntry::make('eventos')->hiddenLabel()->view('panel.caso.historial')]),
             ]),
         ]);
@@ -194,6 +213,7 @@ class CasoResource extends Resource
         return [
             'index' => ListCasos::route('/'),
             'view' => ViewCaso::route('/{record}'),
+            'view-reportes' => ViewCaso::route('/{record}/reporte'),
         ];
     }
 }

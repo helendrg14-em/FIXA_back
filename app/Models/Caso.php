@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Caso extends Model
 {
@@ -59,6 +60,12 @@ class Caso extends Model
     public function programaciones(): HasMany
     {
         return $this->hasMany(Programacion::class, 'caso_id');
+    }
+
+    public function programacionVigente(): HasOne
+    {
+        return $this->hasOne(Programacion::class, 'caso_id')
+            ->ofMany(['id' => 'max'], fn (Builder $query): Builder => $query->where('vigente', true));
     }
 
     /** Intervención del técnico que espera la aprobación del supervisor o del administrador. */
