@@ -34,7 +34,7 @@ class RecuperarPasswordController extends Controller
         $usuario = User::where('correo', $correo)->first();
 
         // Hasta 3 correos por cuenta cada 15 minutos: nadie puede llenar la bandeja de otro.
-        if ($usuario?->activo && $usuario->tipo?->puedeEntrarAlPanel()
+        if ($usuario?->activo && $usuario->rol?->puedeEntrarAlPanel()
             && RateLimiter::attempt("recuperar:{$usuario->id}", 3, fn () => true, 15 * 60)) {
             defer(function () use ($usuario): void {
                 try {

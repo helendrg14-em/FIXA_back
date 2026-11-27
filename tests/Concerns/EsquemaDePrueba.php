@@ -166,7 +166,7 @@ trait EsquemaDePrueba
         $pdo->sqliteCreateFunction('ST_Y', fn ($punto) => $coordenada($punto, 2), 1);
         Schema::create('usuarios', function (Blueprint $t) {
             $t->id();
-            $t->string('tipo');
+            $t->string('rol');
             $t->string('nombres');
             $t->string('apellidos');
             $t->string('correo')->unique();
@@ -192,7 +192,7 @@ trait EsquemaDePrueba
     protected function usuario(TipoUsuario $tipo = TipoUsuario::Administrador, array $datos = []): User
     {
         return User::forceCreate([
-            'tipo' => $tipo,
+            'rol' => $tipo,
             'nombres' => 'Nombre',
             'apellidos' => 'Prueba',
             'correo' => uniqid('prueba').'@fixa.test',

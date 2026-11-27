@@ -59,7 +59,7 @@ class GestionarIntervencion extends Page implements HasTable
 
     public static function canAccess(): bool
     {
-        return ServicioAutenticacion::getInstance()->usuario()?->tipo === TipoUsuario::Tecnico;
+        return ServicioAutenticacion::getInstance()->usuario()?->rol === TipoUsuario::Tecnico;
     }
 
     public function getSubheading(): ?string

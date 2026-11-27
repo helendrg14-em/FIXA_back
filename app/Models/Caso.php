@@ -82,7 +82,7 @@ class Caso extends Model
     {
         return match (true) {
             $usuario?->esAdministrador() => $consulta,
-            $usuario?->tipo === TipoUsuario::Supervisor && $usuario->unidad_id !== null => $consulta->where('unidad_id', $usuario->unidad_id),
+            $usuario?->rol === TipoUsuario::Supervisor && $usuario->unidad_id !== null => $consulta->where('unidad_id', $usuario->unidad_id),
             default => $consulta->whereRaw('1 = 0'),
         };
     }

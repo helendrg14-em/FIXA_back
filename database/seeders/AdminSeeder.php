@@ -34,7 +34,7 @@ class AdminSeeder extends Seeder
         }
 
         $admin->fill([
-            'tipo' => TipoUsuario::Administrador,
+            'rol' => TipoUsuario::Administrador,
             'activo' => true,
             'debe_registrar_password' => false,
             'nombres' => config('fixa.admin.nombres') ?: 'Administrador',

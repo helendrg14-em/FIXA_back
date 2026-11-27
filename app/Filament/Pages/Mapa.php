@@ -42,7 +42,7 @@ class Mapa extends Page
         $usuario = ServicioAutenticacion::getInstance()->usuario();
 
         return $usuario?->esAdministrador()
-            || ($usuario?->tipo === TipoUsuario::Supervisor && $usuario->unidad_id !== null);
+            || ($usuario?->rol === TipoUsuario::Supervisor && $usuario->unidad_id !== null);
     }
 
     /** Al cambiar un filtro, el mapa se vuelve a pintar sin recargar la página. */

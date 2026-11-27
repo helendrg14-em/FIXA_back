@@ -21,7 +21,7 @@ abstract class ResumenDeInicio extends Widget
 
     public static function canView(): bool
     {
-        return Filament::auth()->user()?->tipo === static::$perfil;
+        return Filament::auth()->user()?->rol === static::$perfil;
     }
 
     protected function usuario(): User

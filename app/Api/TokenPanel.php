@@ -32,7 +32,7 @@ final class TokenPanel
             'sub' => (string) $usuario->getKey(),
             'jti' => (string) Str::uuid(),
             // Nombres que la API lee como ClaimTypes.Role y ClaimTypes.Name.
-            'role' => $usuario->tipo->value,
+            'role' => $usuario->rol->value,
             'unique_name' => $usuario->getFilamentName(),
             'iat' => $ahora,
             'nbf' => $ahora,

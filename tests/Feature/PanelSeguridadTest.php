@@ -67,7 +67,7 @@ class PanelSeguridadTest extends TestCase
         Livewire::test(CreateUsuario::class)
             ->fillForm([
                 'nombres' => 'Ana', 'apellidos' => 'Rojas', 'correo' => 'ANA@fixa.test',
-                'tipo' => 'supervisor', 'unidad_id' => $unidad->id, 'cargo' => 'Jefa',
+                'rol' => 'supervisor', 'unidad_id' => $unidad->id, 'cargo' => 'Jefa',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -83,9 +83,9 @@ class PanelSeguridadTest extends TestCase
         $this->actingAs($this->usuario());
 
         Livewire::test(CreateUsuario::class)
-            ->fillForm(['nombres' => 'A', 'apellidos' => 'B', 'correo' => 'nuevo@fixa.test', 'tipo' => 'administrador'])
+            ->fillForm(['nombres' => 'A', 'apellidos' => 'B', 'correo' => 'nuevo@fixa.test', 'rol' => 'administrador'])
             ->call('create')
-            ->assertHasFormErrors(['tipo']);
+            ->assertHasFormErrors(['rol']);
 
         $this->assertFalse(User::where('correo', 'nuevo@fixa.test')->exists());
     }
@@ -96,11 +96,11 @@ class PanelSeguridadTest extends TestCase
         $tecnico = $this->usuario(TipoUsuario::Tecnico, ['especialidad' => 'Vías']);
 
         Livewire::test(EditUsuario::class, ['record' => $tecnico->getKey()])
-            ->fillForm(['tipo' => 'administrador'])
+            ->fillForm(['rol' => 'administrador'])
             ->call('save')
-            ->assertHasFormErrors(['tipo']);
+            ->assertHasFormErrors(['rol']);
 
-        $this->assertSame(TipoUsuario::Tecnico, $tecnico->fresh()->tipo);
+        $this->assertSame(TipoUsuario::Tecnico, $tecnico->fresh()->rol);
     }
 
     public function test_a_otro_administrador_no_se_le_cambia_el_perfil(): void
@@ -109,8 +109,8 @@ class PanelSeguridadTest extends TestCase
         $otro = $this->usuario();
 
         Livewire::test(EditUsuario::class, ['record' => $otro->getKey()])
-            ->assertFormFieldIsDisabled('tipo')
-            ->assertFormSet(['tipo' => TipoUsuario::Administrador->value]);
+            ->assertFormFieldIsDisabled('rol')
+            ->assertFormSet(['rol' => TipoUsuario::Administrador->value]);
     }
 
     public function test_crear_cuenta_no_ofrece_crear_otra(): void
@@ -125,7 +125,7 @@ class PanelSeguridadTest extends TestCase
         $this->actingAs($this->usuario());
 
         Livewire::test(CreateUsuario::class)
-            ->fillForm(['nombres' => 'A', 'apellidos' => 'B', 'correo' => 'a@fixa.test', 'tipo' => 'supervisor'])
+            ->fillForm(['nombres' => 'A', 'apellidos' => 'B', 'correo' => 'a@fixa.test', 'rol' => 'supervisor'])
             ->call('create')
             ->assertHasFormErrors(['unidad_id' => 'required']);
     }
