@@ -6,8 +6,6 @@ use App\Enums\Prioridad;
 use App\Filament\Resources\Categorias\CategoriaResource;
 use App\Filament\Resources\Categorias\Pages\EditCategoria;
 use App\Filament\Resources\Categorias\RelationManagers\MetasAtencionRelationManager;
-use App\Filament\Resources\Feriados\FeriadoResource;
-use App\Enums\TipoUsuario;
 use App\Models\Categoria;
 use App\Models\Feriado;
 use App\Models\MetaAtencion;
@@ -111,14 +109,12 @@ class PlazosTest extends TestCase
         $this->assertSame(2, $categoria->metasAtencion()->where('prioridad', Prioridad::Baja->value)->count());
     }
 
-    public function test_solo_el_administrador_ve_feriados(): void
+    public function test_el_panel_ya_no_tiene_apartado_de_feriados(): void
     {
-        $this->actingAs($this->usuario(TipoUsuario::Supervisor));
-        $this->get(FeriadoResource::getUrl('index'))->assertForbidden();
-
-        $this->flushSession();
         $this->actingAs($this->usuario());
-        $this->get(FeriadoResource::getUrl('index'))->assertOk();
+
         $this->get(CategoriaResource::getUrl('index'))->assertOk();
+        $this->get('/admin')->assertOk()->assertDontSee('Feriados');
+        $this->get('/admin/feriados')->assertNotFound();
     }
 }

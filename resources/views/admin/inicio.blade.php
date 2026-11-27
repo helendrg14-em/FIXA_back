@@ -99,20 +99,6 @@
                         </span>
                         <x-filament::icon :icon="Heroicon::ChevronRight" class="fx-acceso-flecha" />
                     </a>
-                    <a class="fx-acceso" href="{{ $urlFeriados }}">
-                        <span class="fx-acceso-icono"><x-filament::icon :icon="Heroicon::OutlinedCalendarDays" /></span>
-                        <span class="fx-acceso-texto">
-                            <strong>Feriados</strong>
-                            <span>
-                                @if ($feriados->isNotEmpty())
-                                    Próximo: {{ $feriados->first()->nombre }}
-                                @else
-                                    Sin feriados próximos cargados
-                                @endif
-                            </span>
-                        </span>
-                        <x-filament::icon :icon="Heroicon::ChevronRight" class="fx-acceso-flecha" />
-                    </a>
                     <a class="fx-acceso" href="{{ $urlUsuarios }}">
                         <span class="fx-acceso-icono"><x-filament::icon :icon="Heroicon::OutlinedUsers" /></span>
                         <span class="fx-acceso-texto">
@@ -122,25 +108,6 @@
                         <x-filament::icon :icon="Heroicon::ChevronRight" class="fx-acceso-flecha" />
                     </a>
                 </nav>
-            </x-fixa.bloque>
-
-            <x-fixa.bloque titulo="Próximos feriados" descripcion="No cuentan como días hábiles en los plazos." :enlace="$urlFeriados" texto-enlace="Calendario">
-                @forelse ($feriados as $feriado)
-                    <div class="fx-fila">
-                        <span class="fx-fecha" aria-hidden="true">
-                            <span>{{ $feriado->fecha->format('j') }}</span>
-                            <span>{{ $feriado->fecha->locale('es')->translatedFormat('M') }}</span>
-                        </span>
-                        <span class="fx-fila-principal">
-                            <strong>{{ $feriado->nombre }}</strong>
-                            <span>{{ ucfirst($feriado->fecha->locale('es')->translatedFormat('l j \d\e F')) }}</span>
-                        </span>
-                    </div>
-                @empty
-                    <x-fixa.vacio titulo="No hay feriados próximos cargados." :icono="Heroicon::OutlinedCalendar">
-                        Cárgalos para que los plazos se calculen bien.
-                    </x-fixa.vacio>
-                @endforelse
             </x-fixa.bloque>
         </div>
     </div>

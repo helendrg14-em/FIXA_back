@@ -6,12 +6,9 @@ use App\Enums\EstadoCaso;
 use App\Filament\Pages\ConsultarSeguimiento;
 use App\Filament\Pages\NuevoReporte;
 use App\Filament\Resources\Casos\Pages\ListCasos;
-use App\Filament\Resources\Feriados\Pages\ManageFeriados;
-use App\Filament\Resources\Feriados\Widgets\CalendarioFeriados;
 use App\Models\Caso;
 use App\Models\Categoria;
 use App\Models\EventoHistorial;
-use App\Models\Feriado;
 use App\Models\Reporte;
 use App\Models\UnidadResponsable;
 use Filament\Facades\Filament;
@@ -82,28 +79,6 @@ class PanelDisenoTest extends TestCase
             ->assertSee('Calle deteriorada')
             ->assertSee('registrado por app_movil')
             ->assertDontSee('Motivo sin foto');
-    }
-
-    public function test_el_calendario_marca_los_feriados_del_mes(): void
-    {
-        Feriado::create(['fecha' => '2026-11-02', 'nombre' => 'Todos Santos', 'fuente' => 'Decreto']);
-
-        Livewire::test(CalendarioFeriados::class)
-            ->set('mes', '2026-11')
-            ->assertSee('Noviembre de 2026')
-            ->assertSee('Todos Santos')
-            ->assertSee('1 feriado este mes.')
-            ->call('siguiente')
-            ->assertSet('mes', '2026-12')
-            ->assertDontSee('Todos Santos');
-    }
-
-    public function test_tocar_un_dia_abre_agregar_feriado_con_esa_fecha(): void
-    {
-        Livewire::test(ManageFeriados::class)
-            ->dispatch('crear-feriado', fecha: '2026-12-08')
-            ->assertActionMounted('create')
-            ->assertSchemaStateSet(['fecha' => '2026-12-08'], 'mountedActionSchema0');
     }
 
     public function test_los_mensajes_de_validacion_estan_en_espanol(): void

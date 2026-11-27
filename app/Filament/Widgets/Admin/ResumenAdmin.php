@@ -9,12 +9,10 @@ use App\Filament\Pages\ControlIntervenciones;
 use App\Filament\Pages\GestionarReportes;
 use App\Filament\Resources\Casos\CasoResource;
 use App\Filament\Resources\Categorias\CategoriaResource;
-use App\Filament\Resources\Feriados\FeriadoResource;
 use App\Filament\Resources\Usuarios\UsuarioResource;
 use App\Filament\Widgets\ResumenDeInicio;
 use App\Models\Caso;
 use App\Models\Categoria;
-use App\Models\Feriado;
 use App\Models\User;
 
 class ResumenAdmin extends ResumenDeInicio
@@ -46,13 +44,11 @@ class ResumenAdmin extends ResumenDeInicio
             'totalSinContrasena' => $activos->where('debe_registrar_password', true)->count(),
             'categoriasActivas' => (int) $categorias->activas,
             'categorias' => (int) $categorias->total,
-            'feriados' => Feriado::whereDate('fecha', '>=', today())->orderBy('fecha')->limit(4)->get(),
             'casosAbiertos' => (int) $casos->abiertos,
             'casosVencidos' => (int) $casos->vencidos,
             'urlUsuarios' => UsuarioResource::getUrl('index'),
             'urlNuevoUsuario' => UsuarioResource::getUrl('create'),
             'urlCategorias' => CategoriaResource::getUrl('index'),
-            'urlFeriados' => FeriadoResource::getUrl('index'),
             'urlCasos' => CasoResource::getUrl('index'),
             'operacion' => [
                 ['titulo' => 'Gestionar reportes', 'url' => GestionarReportes::getUrl(), 'icono' => GestionarReportes::getNavigationIcon()],

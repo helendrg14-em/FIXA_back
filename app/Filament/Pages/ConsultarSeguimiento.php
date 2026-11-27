@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Auth\ServicioAutenticacion;
 use App\Filament\Resources\Casos\CasoResource;
 use App\Filament\Resources\Casos\Pages\ViewCaso;
 use App\Models\Caso;
@@ -26,11 +25,15 @@ class ConsultarSeguimiento extends Page implements HasTable
 
     protected static ?string $slug = 'seguimiento';
 
+    // Sub-opción de «Gestionar casos» en el menú, como en el diagrama de casos de uso.
+    protected static ?string $navigationParentItem = 'Gestionar casos';
+
     protected static ?int $navigationSort = 4;
 
+    /** Supervisor y administrador (diagrama de casos de uso); cada uno solo ve los casos que le corresponden. */
     public static function canAccess(): bool
     {
-        return ServicioAutenticacion::getInstance()->esAdministrador();
+        return CasoResource::canAccess();
     }
 
     public function getSubheading(): ?string

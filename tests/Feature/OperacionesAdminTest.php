@@ -50,7 +50,7 @@ class OperacionesAdminTest extends TestCase
         config(['services.fixa_api.url' => self::API, 'services.fixa_api.jwt_clave' => str_repeat('a', 40)]);
     }
 
-    public function test_las_nuevas_pantallas_y_sus_accesos_son_solo_del_administrador(): void
+    public function test_las_nuevas_pantallas_son_del_administrador_y_seguimiento_tambien_del_supervisor(): void
     {
         $this->actingAs($this->usuario());
         $inicio = $this->get(Filament::getUrl())->assertOk();
@@ -67,6 +67,12 @@ class OperacionesAdminTest extends TestCase
             $this->actingAs($this->usuario($perfil));
             $inicio = $this->get(Filament::getUrl())->assertOk();
             foreach ($paginas as $pagina) {
+                // Consultar seguimiento también es del supervisor (diagrama de casos de uso).
+                if ($pagina === ConsultarSeguimiento::class && $perfil === TipoUsuario::Supervisor) {
+                    $this->get($pagina::getUrl())->assertOk();
+
+                    continue;
+                }
                 $inicio->assertDontSee($pagina::getUrl());
                 $this->get($pagina::getUrl())->assertForbidden();
             }
