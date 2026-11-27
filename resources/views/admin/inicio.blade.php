@@ -46,7 +46,7 @@
                             <span class="fx-avatar" aria-hidden="true">{{ mb_substr($persona->nombres, 0, 1) }}{{ mb_substr($persona->apellidos, 0, 1) }}</span>
                             <span class="fx-fila-principal">
                                 <strong>{{ $persona->nombres }} {{ $persona->apellidos }}</strong>
-                                <span>{{ $persona->tipo->getLabel() }}</span>
+                                <span>{{ $persona->rol->getLabel() }}</span>
                             </span>
                             <span class="fx-fila-meta">
                                 Cuenta creada {{ $persona->fecha_creacion?->locale('es')->diffForHumans() }}

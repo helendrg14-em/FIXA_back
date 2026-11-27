@@ -20,7 +20,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'tipo' => TipoUsuario::Tecnico,
+            'rol' => TipoUsuario::Tecnico,
             'nombres' => fake()->firstName(),
             'apellidos' => fake()->lastName(),
             'correo' => fake()->unique()->safeEmail(),
@@ -32,12 +32,12 @@ class UserFactory extends Factory
 
     public function administrador(): static
     {
-        return $this->state(fn () => ['tipo' => TipoUsuario::Administrador]);
+        return $this->state(fn () => ['rol' => TipoUsuario::Administrador]);
     }
 
     public function supervisor(): static
     {
-        return $this->state(fn () => ['tipo' => TipoUsuario::Supervisor]);
+        return $this->state(fn () => ['rol' => TipoUsuario::Supervisor]);
     }
 
     public function inactivo(): static

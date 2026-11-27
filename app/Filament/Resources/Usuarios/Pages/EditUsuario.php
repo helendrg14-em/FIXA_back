@@ -11,7 +11,7 @@ class EditUsuario extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        return UsuarioResource::limpiarPorPerfil($data, $data['tipo'] ?? $this->getRecord()->tipo);
+        return UsuarioResource::limpiarPorPerfil($data, $data['rol'] ?? $this->getRecord()->rol);
     }
 
     protected function getRedirectUrl(): string

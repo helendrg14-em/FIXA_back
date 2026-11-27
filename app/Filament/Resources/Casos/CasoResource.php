@@ -49,7 +49,7 @@ class CasoResource extends Resource
     {
         $usuario = ServicioAutenticacion::getInstance()->usuario();
 
-        return $usuario !== null && in_array($usuario->tipo, [TipoUsuario::Administrador, TipoUsuario::Supervisor], true);
+        return $usuario !== null && in_array($usuario->rol, [TipoUsuario::Administrador, TipoUsuario::Supervisor], true);
     }
 
     public static function canView(Model $record): bool

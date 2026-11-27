@@ -52,20 +52,20 @@ class UsuarioResource extends Resource
                 TextInput::make('correo')->label('Correo institucional')->email()->required()->maxLength(120)
                     ->unique(ignoreRecord: true)
                     ->validationMessages(['unique' => 'Ya existe una cuenta con este correo.']),
-                Select::make('tipo')->label('Perfil')->required()->live()->native(false)
+                Select::make('rol')->label('Perfil')->required()->live()->native(false)
                     // Un administrador se crea solo por dentro (AdminSeeder), nunca desde el panel.
                     ->options(fn (?User $record): array => $record?->esAdministrador() ? self::perfiles() : self::perfilesAsignables())
                     // Tampoco se le cambia el perfil: así no se pierde el acceso de administrador.
                     ->disabled(fn (?User $record): bool => $record?->esAdministrador() ?? false),
             ]),
             Section::make('Datos del supervisor')->columns(2)
-                ->visible(fn (Get $get): bool => self::tipoEs($get('tipo'), TipoUsuario::Supervisor))
+                ->visible(fn (Get $get): bool => self::rolEs($get('rol'), TipoUsuario::Supervisor))
                 ->schema([
                     Select::make('unidad_id')->label('Unidad responsable')->relationship('unidad', 'nombre')->required()->native(false),
                     TextInput::make('cargo')->required()->maxLength(80),
                 ]),
             Section::make('Datos del técnico')->columns(2)
-                ->visible(fn (Get $get): bool => self::tipoEs($get('tipo'), TipoUsuario::Tecnico))
+                ->visible(fn (Get $get): bool => self::rolEs($get('rol'), TipoUsuario::Tecnico))
                 ->schema([
                     TextInput::make('especialidad')->required()->maxLength(80),
                     Select::make('cuadrilla_id')->label('Cuadrilla')->relationship('cuadrilla', 'nombre')->native(false)
@@ -83,14 +83,14 @@ class UsuarioResource extends Resource
                     ->state(fn (User $record): string => $record->getFilamentName())
                     ->searchable(['nombres', 'apellidos']),
                 TextColumn::make('correo')->searchable(),
-                TextColumn::make('tipo')->label('Perfil')->badge()->color('primary'),
+                TextColumn::make('rol')->label('Perfil')->badge()->color('primary'),
                 TextColumn::make('unidad.sigla')->label('Unidad')->placeholder('Sin unidad'),
                 TextColumn::make('estado_contrasena')->label('Contraseña')
                     ->state(fn (User $record): string => $record->debe_registrar_password ? 'Pendiente' : 'Creada'),
                 IconColumn::make('activo')->boolean(),
             ])
             ->filters([
-                SelectFilter::make('tipo')->label('Perfil')->options(self::perfiles()),
+                SelectFilter::make('rol')->label('Perfil')->options(self::perfiles()),
                 TernaryFilter::make('activo'),
             ])
             ->recordActions([
@@ -162,14 +162,14 @@ class UsuarioResource extends Resource
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
-    public static function limpiarPorPerfil(array $data, TipoUsuario|string|null $tipo): array
+    public static function limpiarPorPerfil(array $data, TipoUsuario|string|null $rol): array
     {
-        if (! self::tipoEs($tipo, TipoUsuario::Supervisor)) {
+        if (! self::rolEs($rol, TipoUsuario::Supervisor)) {
             $data['cargo'] = null;
             $data['unidad_id'] = null;
         }
 
-        if (! self::tipoEs($tipo, TipoUsuario::Tecnico)) {
+        if (! self::rolEs($rol, TipoUsuario::Tecnico)) {
             $data['especialidad'] = null;
             $data['cuadrilla_id'] = null;
         }
@@ -210,8 +210,8 @@ class UsuarioResource extends Resource
         return collect(self::perfiles())->except(TipoUsuario::Administrador->value)->all();
     }
 
-    private static function tipoEs(TipoUsuario|string|null $tipo, TipoUsuario $esperado): bool
+    private static function rolEs(TipoUsuario|string|null $rol, TipoUsuario $esperado): bool
     {
-        return ($tipo instanceof TipoUsuario ? $tipo->value : $tipo) === $esperado->value;
+        return ($rol instanceof TipoUsuario ? $rol->value : $rol) === $esperado->value;
     }
 }

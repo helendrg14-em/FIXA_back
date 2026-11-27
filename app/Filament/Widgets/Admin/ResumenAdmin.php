@@ -24,7 +24,7 @@ class ResumenAdmin extends ResumenDeInicio
     protected function getViewData(): array
     {
         // Una consulta por tabla: con la base en otro servidor, cada ida y vuelta cuenta.
-        $usuarios = User::get(['id', 'tipo', 'nombres', 'apellidos', 'activo', 'debe_registrar_password', 'fecha_creacion']);
+        $usuarios = User::get(['id', 'rol', 'nombres', 'apellidos', 'activo', 'debe_registrar_password', 'fecha_creacion']);
         $activos = $usuarios->where('activo', true);
         $categorias = Categoria::toBase()
             ->selectRaw('count(*) as total, sum(case when activa then 1 else 0 end) as activas')
@@ -37,7 +37,7 @@ class ResumenAdmin extends ResumenDeInicio
             ...$this->momento(),
             'usuario' => $this->usuario(),
             'equipo' => collect([TipoUsuario::Administrador, TipoUsuario::Supervisor, TipoUsuario::Tecnico])
-                ->map(fn (TipoUsuario $tipo): array => ['perfil' => $tipo->getLabel(), 'total' => $activos->where('tipo', $tipo)->count()]),
+                ->map(fn (TipoUsuario $tipo): array => ['perfil' => $tipo->getLabel(), 'total' => $activos->where('rol', $tipo)->count()]),
             'totalActivos' => $activos->count(),
             'inactivos' => $usuarios->where('activo', false)->count(),
             'sinContrasena' => $activos->where('debe_registrar_password', true)->sortByDesc('fecha_creacion')->take(5)->values(),

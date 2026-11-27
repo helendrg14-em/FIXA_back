@@ -19,7 +19,7 @@ class CreateUsuario extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data = UsuarioResource::limpiarPorPerfil($data, $data['tipo']);
+        $data = UsuarioResource::limpiarPorPerfil($data, $data['rol']);
 
         return [
             ...$data,

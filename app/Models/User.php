@@ -35,7 +35,7 @@ class User extends Authenticatable implements FilamentUser, HasName
      * @var list<string>
      */
     protected $fillable = [
-        'tipo',
+        'rol',
         'activo',
         'debe_registrar_password',
         'nombres',
@@ -62,7 +62,7 @@ class User extends Authenticatable implements FilamentUser, HasName
     protected function casts(): array
     {
         return [
-            'tipo' => TipoUsuario::class,
+            'rol' => TipoUsuario::class,
             'password_hash' => 'hashed',
             'activo' => 'boolean',
             'debe_registrar_password' => 'boolean',
@@ -113,7 +113,7 @@ class User extends Authenticatable implements FilamentUser, HasName
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->activo && $this->tipo?->puedeEntrarAlPanel();
+        return $this->activo && $this->rol?->puedeEntrarAlPanel();
     }
 
     public function getFilamentName(): string
@@ -123,7 +123,7 @@ class User extends Authenticatable implements FilamentUser, HasName
 
     public function esAdministrador(): bool
     {
-        return $this->tipo === TipoUsuario::Administrador;
+        return $this->rol === TipoUsuario::Administrador;
     }
 
     /**

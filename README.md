@@ -125,16 +125,19 @@ El administrador crea la cuenta y el sistema envía un enlace de un solo uso, v�
 ## Base de datos y API en C#
 
 La app Flutter y el panel usan la API en ASP.NET ([Fixa_API](https://github.com/helendrg14-em/Fixa_API)),
-que trabaja sobre esta misma base. **Laravel es el único dueño del esquema**: la API de C# lee y
-escribe datos, pero nunca crea ni cambia tablas.
+que trabaja sobre esta misma base. **Laravel crea las tablas del sistema** (usuarios, casos,
+reportes, notificaciones…). La API de C# solo crea sus tablas propias (`plantillas_notificacion`)
+con migraciones de Entity Framework Core, que aplica sola al iniciar.
 
-1. Toda tabla o columna nueva empieza aquí, como migración de Laravel con
-   `ENABLE ROW LEVEL SECURITY`, aunque solo la use la API de C#.
+1. Toda tabla o columna nueva del sistema empieza aquí, como migración de Laravel con
+   `ENABLE ROW LEVEL SECURITY`.
 2. Después se actualiza a mano el modelo de Entity Framework en la API para que coincida.
-   En C# no se usan `dotnet ef migrations` ni `EnsureCreated`.
 3. Se regenera `Fixa.Api.Tests/Datos/schema.sql` en el repositorio de la API, para que sus
    pruebas corran contra el esquema nuevo (el comando está en su README).
 4. Al desplegar, primero `php artisan migrate` contra Supabase y después la API de C#.
+
+El perfil de cada funcionario está en la columna **`rol`** de `usuarios` (`administrador`,
+`supervisor`, `tecnico`, `operador`).
 
 **Cómo se reparten el trabajo el panel y la API:** el panel *lee* directo de la base (bandeja,
 detalle, revisiones), pero todo lo que *cambia* un caso o crea un reporte va por la API
