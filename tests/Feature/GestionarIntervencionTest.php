@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\EstadoCaso;
 use App\Enums\TipoUsuario;
+use App\Filament\Pages\ConsultarSeguimiento;
 use App\Filament\Pages\GestionarIntervencion;
 use App\Filament\Resources\Casos\CasoResource;
 use App\Filament\Resources\Casos\Pages\ListCasos;
@@ -175,5 +176,34 @@ class GestionarIntervencionTest extends TestCase
             ->assertDontSee(CasoResource::getUrl('view', ['record' => $this->enAtencion]))
             ->assertTableColumnHidden('reportes_count')
             ->assertTableColumnHidden('fecha_creacion');
+    }
+
+    public function test_el_supervisor_consulta_el_seguimiento_debajo_de_gestionar_casos(): void
+    {
+        $this->actingAs($this->usuario(TipoUsuario::Supervisor, ['unidad_id' => $this->enAtencion->unidad_id]));
+
+        $this->assertTrue(ConsultarSeguimiento::canAccess());
+        $this->get('/admin')->assertOk()->assertSeeInOrder(['Gestionar casos', 'Consultar seguimiento']);
+
+        Livewire::test(ConsultarSeguimiento::class)
+            ->searchTable('fx-2026-00000'.$this->enAtencion->id)
+            ->assertCanSeeTableRecords([$this->enAtencion])
+            ->assertCanNotSeeTableRecords([$this->programado]);
+    }
+
+    public function test_el_supervisor_solo_consulta_los_casos_de_su_unidad(): void
+    {
+        $otraUnidad = UnidadResponsable::create(['nombre' => 'Alumbrado', 'sigla' => 'ALU']);
+        $this->actingAs($this->usuario(TipoUsuario::Supervisor, ['unidad_id' => $otraUnidad->id]));
+
+        Livewire::test(ConsultarSeguimiento::class)
+            ->assertCanNotSeeTableRecords([$this->programado, $this->enAtencion]);
+    }
+
+    public function test_el_tecnico_no_entra_a_consultar_seguimiento(): void
+    {
+        $this->actingAs($this->tecnico);
+
+        $this->assertFalse(ConsultarSeguimiento::canAccess());
     }
 }

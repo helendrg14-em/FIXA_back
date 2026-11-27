@@ -17,7 +17,7 @@
         <p>Panel de trabajo para el equipo municipal que recibe, prioriza y resuelve los reportes ciudadanos.</p>
 
         <ul class="fx-login-perfiles">
-            <li><strong>Administración</strong><span>Cuentas, categorías, plazos y feriados.</span></li>
+            <li><strong>Administración</strong><span>Cuentas, categorías y plazos.</span></li>
             <li><strong>Supervisión</strong><span>Prioriza y asigna los casos de su unidad.</span></li>
             <li><strong>Técnicos</strong><span>Atienden la agenda de su cuadrilla.</span></li>
         </ul>
